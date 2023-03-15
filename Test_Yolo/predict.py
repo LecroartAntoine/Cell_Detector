@@ -1,40 +1,20 @@
-import os
+import os, cv2
 from ultralytics import YOLO
-import cv2
+from PIL import Image
 
 
-path = 'images/IMG_4925.jpg'
-img_path_out = '{}_out.jpg'.format(path)
+model = YOLO("C:/Users/antoine.lecroart/Documents/GitHub/Cell_Detector/Test_Yolo/best.pt")
 
-cap = cv2.img_read(path)
+im1 = Image.open("C:/Users/antoine.lecroart/Documents/GitHub/Cell_Detector/Test_Yolo/images/train/IMG_4892.jpg")
 
-H, W, _ = frame.shape
-out = cv2.VideoWriter(video_path_out, cv2.VideoWriter_fourcc(*'MP4V'), int(cap.get(cv2.CAP_PROP_FPS)), (W, H))
+results = model.predict(source=im1, save=True)  # save plotted images
 
-model_path = os.path.join('.', 'runs', 'detect', 'train', 'weights', 'last.pt')
+print(results[0].boxes)
 
-# Load a model
-model = YOLO(model_path)  # load a custom model
 
-threshold = 0.5
+result = Image.open(u'C:/Users/antoine.lecroart/Documents/GitHub/runs/detect/predict/image0.jpg')
 
-class_name_dict = {0: 'alpaca'}
+# cv2.rectangle(result,(x_min,y_min),(x_max,y_max),color,2)
 
-while ret:
 
-    results = model(frame)[0]
-
-    for result in results.boxes.data.tolist():
-        x1, y1, x2, y2, score, class_id = result
-
-        if score > threshold:
-            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 4)
-            cv2.putText(frame, class_name_dict[int(class_id)].upper(), (int(x1), int(y1 - 10)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 3, cv2.LINE_AA)
-
-    out.write(frame)
-    ret, frame = cap.read()
-
-cap.release()
-out.release()
-cv2.destroyAllWindows()
+result.show()
