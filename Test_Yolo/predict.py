@@ -11,9 +11,9 @@ model.predict(im1)  # save plotted images
 
 
 
-# result = Image.open(u'C:/Users/antoine.lecroart/Documents/GitHub/runs/detect/predict/image0.jpg')
+result = Image.open(u'C:/Users/antoine.lecroart/Documents/GitHub/runs/detect/predict/image0.jpg')
 
 
 
 
-# result.show()
+result.show()
