@@ -5,9 +5,9 @@ from PIL import Image
 print(os.getcwd())
 
 
-model = YOLO("Cell_Detector/Test_Yolo/best.pt")
+model = YOLO("Test_Yolo/best.pt")
 
-im1 = cv2.imread("Cell_Detector/Test_Yolo/images/train/1678464986902.jpg")
+im1 = cv2.imread("Test_Yolo/images/train/1678464987300.jpg")
 
 
 
