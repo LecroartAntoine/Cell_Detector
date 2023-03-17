@@ -1,0 +1,3 @@
+{names: [cell], nc: 1, test: 'C:\Users\antoine.lecroart\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\test',
+  train: 'C:\Users\antoine.lecroart\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\train',
+  val: 'C:\Users\antoine.lecroart\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\val'}
