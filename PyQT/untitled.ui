@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1132</width>
+    <height>891</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QFormLayout" name="formLayout">
+    <property name="fieldGrowthPolicy">
+     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+    </property>
+    <item row="0" column="0" colspan="2">
+     <layout class="QHBoxLayout" name="infos">
+      <property name="spacing">
+       <number>20</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="cpu">
+        <item>
+         <widget class="QLabel" name="cpu_label">
+          <property name="text">
+           <string>CPU</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="cpu_bar">
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="ram">
+        <item>
+         <widget class="QLabel" name="ram_label">
+          <property name="text">
+           <string>RAM</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="ram_bar">
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="disk">
+        <item>
+         <widget class="QLabel" name="disk_label">
+          <property name="text">
+           <string>DISQUE</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="disk_bar">
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <layout class="QVBoxLayout" name="menu">
+      <property name="leftMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>15</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="open">
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ouvrir un image ou un dossier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Ouvrir</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="prepoc">
+        <property name="text">
+         <string>Prétraitement</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="detect">
+        <property name="text">
+         <string>Détéction</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="calc">
+        <property name="text">
+         <string>Calculs</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reset">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="files"/>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="1">
+     <widget class="QStackedWidget" name="browser">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="preproc">
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="preproc_tool">
+          <item>
+           <layout class="QVBoxLayout" name="automatic">
+            <item>
+             <widget class="QLabel" name="auto_label">
+              <property name="text">
+               <string>Automatic</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="auto_slider">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="baseSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>60</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::NoTicks</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="auto_box">
+              <property name="cursor">
+               <cursorShape>IBeamCursor</cursorShape>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="auto_apply">
+              <property name="text">
+               <string>Appliquer</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="manual">
+            <item>
+             <widget class="QLabel" name="manual_label">
+              <property name="text">
+               <string>Manuel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="manual_settings">
+              <property name="leftMargin">
+               <number>10</number>
+              </property>
+              <property name="topMargin">
+               <number>10</number>
+              </property>
+              <property name="rightMargin">
+               <number>10</number>
+              </property>
+              <property name="bottomMargin">
+               <number>10</number>
+              </property>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="y_max_box"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="x_max_box">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="x_min_box">
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="y_min_box"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="y_min">
+                <property name="text">
+                 <string>Y Min</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="y_max">
+                <property name="text">
+                 <string>Y Max</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="x_min">
+                <property name="text">
+                 <string>X Min</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="x_max">
+                <property name="text">
+                 <string>X Max</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="manual_apply">
+              <property name="text">
+               <string>Appliquer</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="image_visu">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <layout class="QHBoxLayout" name="preproc_confirm">
+          <item>
+           <widget class="QPushButton" name="preproc_accept">
+            <property name="text">
+             <string>Confirmer</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="preproc_reset">
+            <property name="text">
+             <string>Annuler</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="detection"/>
+      <widget class="QWidget" name="calculs"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1132</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
