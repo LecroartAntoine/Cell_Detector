@@ -149,6 +149,9 @@
            <layout class="QVBoxLayout" name="automatic">
             <item>
              <widget class="QLabel" name="auto_label">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
               <property name="text">
                <string>Automatic</string>
               </property>
@@ -158,36 +161,37 @@
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="auto_slider">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="baseSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="value">
-               <number>60</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::NoTicks</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="auto_box">
-              <property name="cursor">
-               <cursorShape>IBeamCursor</cursorShape>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Valeur threshold</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="auto_box">
+                <property name="cursor">
+                 <cursorShape>ArrowCursor</cursorShape>
+                </property>
+                <property name="accelerated">
+                 <bool>true</bool>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="stepType">
+                 <enum>QAbstractSpinBox::DefaultStepType</enum>
+                </property>
+                <property name="value">
+                 <number>60</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QPushButton" name="auto_apply">
@@ -197,6 +201,19 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="lineWidth">
+             <number>5</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QVBoxLayout" name="manual">
@@ -224,15 +241,18 @@
               <property name="bottomMargin">
                <number>10</number>
               </property>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="y_max_box"/>
-              </item>
+              <property name="spacing">
+               <number>10</number>
+              </property>
               <item row="1" column="1">
                <widget class="QSpinBox" name="x_max_box">
                 <property name="maximum">
                  <number>10000</number>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QSpinBox" name="y_max_box"/>
               </item>
               <item row="0" column="1">
                <widget class="QSpinBox" name="x_min_box">
@@ -241,23 +261,10 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="y_min_box"/>
-              </item>
-              <item row="2" column="0">
+              <item row="0" column="2">
                <widget class="QLabel" name="y_min">
                 <property name="text">
                  <string>Y Min</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="y_max">
-                <property name="text">
-                 <string>Y Max</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -284,6 +291,19 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="3">
+               <widget class="QSpinBox" name="y_min_box"/>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="y_max">
+                <property name="text">
+                 <string>Y Max</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -297,14 +317,14 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QLabel" name="image_visu">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <layout class="QHBoxLayout" name="preproc_confirm">
           <item>
            <widget class="QPushButton" name="preproc_accept">
@@ -321,6 +341,19 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="1" column="1">
+         <widget class="Line" name="line_2">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>10</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
