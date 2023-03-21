@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1132</width>
-    <height>891</height>
+    <width>1092</width>
+    <height>857</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
         <item>
          <widget class="QProgressBar" name="cpu_bar">
           <property name="value">
-           <number>24</number>
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -53,7 +53,7 @@
         <item>
          <widget class="QProgressBar" name="ram_bar">
           <property name="value">
-           <number>24</number>
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -71,7 +71,7 @@
         <item>
          <widget class="QProgressBar" name="disk_bar">
           <property name="value">
-           <number>24</number>
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -133,65 +133,75 @@
     <item row="1" column="1">
      <widget class="QStackedWidget" name="browser">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="preproc">
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="auto_label">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="text">
+             <string>Automatic</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="manual_label">
+            <property name="text">
+             <string>Manuel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
          <layout class="QHBoxLayout" name="preproc_tool">
           <item>
            <layout class="QVBoxLayout" name="automatic">
             <item>
-             <widget class="QLabel" name="auto_label">
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
+             <widget class="QLabel" name="threshold_label">
               <property name="text">
-               <string>Automatic</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <string>Valeur threshold (0 - 255)</string>
               </property>
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Valeur threshold</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QSpinBox" name="auto_box">
-                <property name="cursor">
-                 <cursorShape>ArrowCursor</cursorShape>
-                </property>
-                <property name="accelerated">
-                 <bool>true</bool>
-                </property>
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>255</number>
-                </property>
-                <property name="stepType">
-                 <enum>QAbstractSpinBox::DefaultStepType</enum>
-                </property>
-                <property name="value">
-                 <number>60</number>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QSpinBox" name="threshold_box">
+              <property name="cursor">
+               <cursorShape>ArrowCursor</cursorShape>
+              </property>
+              <property name="accelerated">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="stepType">
+               <enum>QAbstractSpinBox::DefaultStepType</enum>
+              </property>
+              <property name="value">
+               <number>60</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="auto_apply">
@@ -203,30 +213,7 @@
            </layout>
           </item>
           <item>
-           <widget class="Line" name="line">
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="lineWidth">
-             <number>5</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QVBoxLayout" name="manual">
-            <item>
-             <widget class="QLabel" name="manual_label">
-              <property name="text">
-               <string>Manuel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <layout class="QGridLayout" name="manual_settings">
               <property name="leftMargin">
@@ -317,13 +304,6 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="image_visu">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <layout class="QHBoxLayout" name="preproc_confirm">
           <item>
@@ -342,22 +322,135 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="1">
-         <widget class="Line" name="line_2">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>10</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+        <item row="2" column="1">
+         <widget class="QGraphicsView" name="display_preproc"/>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="detection"/>
+      <widget class="QWidget" name="detect_2">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="detect_tool">
+          <item>
+           <layout class="QHBoxLayout" name="detect_model">
+            <item>
+             <widget class="QLabel" name="choose_model_label">
+              <property name="text">
+               <string>Choix du modèle</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="choose_model">
+              <property name="editable">
+               <bool>false</bool>
+              </property>
+              <property name="currentText">
+               <string notr="true">1.0</string>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+              </property>
+              <property name="placeholderText">
+               <string/>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <item>
+               <property name="text">
+                <string>1.0</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="detect_conf">
+            <item row="1" column="1">
+             <widget class="QRadioButton" name="show_conf">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="show_conf_label">
+              <property name="text">
+               <string>Montrer la confiance</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="taux_conf_label">
+              <property name="text">
+               <string>Intervalle de confiance</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="taux_conf">
+              <property name="suffix">
+               <string>%</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>100.000000000000000</double>
+              </property>
+              <property name="stepType">
+               <enum>QAbstractSpinBox::DefaultStepType</enum>
+              </property>
+              <property name="value">
+               <double>95.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="detect_box">
+            <item>
+             <widget class="QLabel" name="box_width_label">
+              <property name="text">
+               <string>Épaisseur des boites</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="box_width">
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="start_detect">
+            <property name="text">
+             <string>Lancer la détéction</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGraphicsView" name="display_detec"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="calculs"/>
      </widget>
     </item>
@@ -368,7 +461,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1132</width>
+     <width>1092</width>
      <height>21</height>
     </rect>
    </property>
