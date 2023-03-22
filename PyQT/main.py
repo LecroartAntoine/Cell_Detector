@@ -181,13 +181,16 @@ class Ui_MainWindow(object):
         self.x_max_box = QtWidgets.QSpinBox(self.preproc)
         self.x_max_box.setMaximum(10000)
         self.x_max_box.setObjectName("x_max_box")
+        self.x_max_box.valueChanged.connect(self.add_xmax)
         self.manual_settings.addWidget(self.x_max_box, 1, 1, 1, 1)
         self.y_max_box = QtWidgets.QSpinBox(self.preproc)
         self.y_max_box.setObjectName("y_max_box")
+        self.y_max_box.valueChanged.connect(self.add_ymax)
         self.manual_settings.addWidget(self.y_max_box, 1, 3, 1, 1)
         self.x_min_box = QtWidgets.QSpinBox(self.preproc)
         self.x_min_box.setMaximum(10000)
         self.x_min_box.setObjectName("x_min_box")
+        self.x_min_box.valueChanged.connect(self.add_xmin)
         self.manual_settings.addWidget(self.x_min_box, 0, 1, 1, 1)
         self.y_min = QtWidgets.QLabel(self.preproc)
         self.y_min.setAlignment(QtCore.Qt.AlignCenter)
@@ -203,6 +206,7 @@ class Ui_MainWindow(object):
         self.manual_settings.addWidget(self.x_max, 1, 0, 1, 1)
         self.y_min_box = QtWidgets.QSpinBox(self.preproc)
         self.y_min_box.setObjectName("y_min_box")
+        self.y_min_box.valueChanged.connect(self.add_ymin)
         self.manual_settings.addWidget(self.y_min_box, 0, 3, 1, 1)
         self.y_max = QtWidgets.QLabel(self.preproc)
         self.y_max.setAlignment(QtCore.Qt.AlignCenter)
@@ -368,8 +372,22 @@ class Ui_MainWindow(object):
         self.ram_bar.setValue(psutil.virtual_memory().percent)
     
     def local_cropAuto(self):
+        self.loadimage()
         self.image = utils.cropAuto(self.image, self.threshold_box.value())
         self.set_image_from_cv()
+
+    def add_xmax(self):
+        self.image = cv2.line(self.image, (self.x_max_box.value(), 0), (self.x_max_box.value(), self.image.shape[0]), (255, 0, 0), 2) 
+        self.set_image_from_cv()
+
+    def add_xmin(self):
+        print('xmin')
+
+    def add_ymax(self):
+        print('')
+
+    def add_ymin(self):
+        print('xmin')
 
 if __name__ == "__main__":
     import sys
