@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os, cv2, psutil
 import numpy as np
+import utils
 
 class PhotoViewer(QtWidgets.QGraphicsView):
     photoClicked = QtCore.pyqtSignal(QtCore.QPoint)
@@ -168,6 +169,7 @@ class Ui_MainWindow(object):
         self.automatic.addWidget(self.threshold_box)
         self.auto_apply = QtWidgets.QPushButton(self.preproc)
         self.auto_apply.setObjectName("auto_apply")
+        self.auto_apply.clicked.connect(self.local_cropAuto)
         self.automatic.addWidget(self.auto_apply)
         self.preproc_tool.addLayout(self.automatic)
         self.manual = QtWidgets.QVBoxLayout()
@@ -350,20 +352,24 @@ class Ui_MainWindow(object):
                     self.files.addItem(file)
     
     def loadimage(self):
-        image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        self.set_image_from_cv(image)
+        self.image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+        self.set_image_from_cv()
 
-    def set_image_from_cv (self, image):
-        height, width, channel = image.shape
+    def set_image_from_cv (self):
+        height, width, channel = self.image.shape
         bytesPerLine = channel * width
-        qImg = QtGui.QImage(image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
+        qImg = QtGui.QImage(self.image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
         self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
         self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
 
     def update_usages(self):
         self.cpu_bar.setValue(psutil.cpu_percent())
         self.ram_bar.setValue(psutil.virtual_memory().percent)
+    
+    def local_cropAuto(self):
+        self.image = utils.cropAuto(self.image, self.threshold_box.value())
+        self.set_image_from_cv()
 
 if __name__ == "__main__":
     import sys
