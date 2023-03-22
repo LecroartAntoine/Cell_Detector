@@ -363,11 +363,15 @@ class Ui_MainWindow(object):
         self.ram_bar.setValue(int(psutil.virtual_memory().percent))
     
     def local_cropAuto(self):
-        self.loadimage()
-        self.image = utils.cropAuto(self.image, self.threshold_box.value())
-        self.set_image_from_cv()
+        try:
+            self.loadimage()
+            self.image = utils.cropAuto(self.image, self.threshold_box.value())
+            self.set_image_from_cv()
+        except:
+            pass
 
     def add_x_max_line(self):
+
         try:
             if len(self.preproc_viewer.scene().items()) > 1:
                 self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
