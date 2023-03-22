@@ -41,7 +41,7 @@ def cropAuto(img, thresh):
         cropped = img[ymin:ymax, xmin:xmax]
 
         # Redimension de l'image par un multiple de 32
-        x = cropped.shape[0]
+        x = cropped.shape[0] if cropped.shape[0] > cropped.shape[1] else cropped.shape[1]
         while x % 32 != 0:
             x -= 1
         resized = cv2.resize(cropped, (x, x), interpolation = cv2.INTER_AREA)

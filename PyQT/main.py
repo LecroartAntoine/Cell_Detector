@@ -1,81 +1,26 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import os, cv2, psutil
+import os, cv2, psutil, ImageViewer
 import numpy as np
 import utils
-
-class PhotoViewer(QtWidgets.QGraphicsView):
-    photoClicked = QtCore.pyqtSignal(QtCore.QPoint)
-
-    def __init__(self, MainWindow):
-        super(PhotoViewer, self).__init__(MainWindow)
-        self._zoom = 0
-        self._empty = True
-        self._scene = QtWidgets.QGraphicsScene(self)
-        self._photo = QtWidgets.QGraphicsPixmapItem()
-        self._scene.addItem(self._photo)
-        self.setScene(self._scene)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
-
-    def hasPhoto(self):
-        return not self._empty
-
-    def fitInView(self, scale=True):
-        rect = QtCore.QRectF(self._photo.pixmap().rect())
-        if not rect.isNull():
-            self.setSceneRect(rect)
-            if self.hasPhoto():
-                unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
-                self.scale(1 / unity.width(), 1 / unity.height())
-                viewrect = self.viewport().rect()
-                scenerect = self.transform().mapRect(rect)
-                factor = min(viewrect.width() / scenerect.width(),
-                             viewrect.height() / scenerect.height())
-                self.scale(factor, factor)
-            self._zoom = 0
-
-    def setPhoto(self, pixmap=None):
-        self._zoom = 0
-        if pixmap and not pixmap.isNull():
-            self._empty = False
-            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-            self._photo.setPixmap(pixmap)
-        else:
-            self._empty = True
-            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
-            self._photo.setPixmap(QtGui.QPixmap())
-        self.fitInView()
-
-    def wheelEvent(self, event):
-        if self.hasPhoto():
-            if event.angleDelta().y() > 0:
-                factor = 1.25
-                self._zoom += 1
-            else:
-                factor = 0.8
-                self._zoom -= 1
-            if self._zoom > 0:
-                self.scale(factor, factor)
-            elif self._zoom == 0:
-                self.fitInView()
-            else:
-                self._zoom = 0
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 1000)
-        self.preproc_viewer = PhotoViewer(MainWindow)
-        self.detect_viewer = PhotoViewer(MainWindow)
+        MainWindow.resize(1920, 1080)
+
+        self.image = np.zeros((0,0,0), np.uint8)
+        # Image Viewer
+        self.preproc_viewer = ImageViewer.PhotoViewer(MainWindow)
+        self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
+
+        # Main window layout
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.formLayout = QtWidgets.QFormLayout(self.centralwidget)
         self.formLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout.setObjectName("formLayout")
+
+#####################################  Infos  ########################################################
         self.infos = QtWidgets.QHBoxLayout()
         self.infos.setSpacing(20)
         self.infos.setObjectName("infos")
@@ -104,6 +49,8 @@ class Ui_MainWindow(object):
         self.ram.addWidget(self.ram_bar)
         self.infos.addLayout(self.ram)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
+
+#################################  MENU  ##################################################
         self.menu = QtWidgets.QVBoxLayout()
         self.menu.setContentsMargins(15, -1, 15, -1)
         self.menu.setObjectName("menu")
@@ -122,6 +69,7 @@ class Ui_MainWindow(object):
         self.calc_button = QtWidgets.QPushButton(self.centralwidget)
         self.calc_button.setObjectName("calc_button")
         self.calc_button.clicked.connect(self.change_page_3)
+        self.calc_button.setEnabled(False)
         self.menu.addWidget(self.calc_button)
         self.reset = QtWidgets.QPushButton(self.centralwidget)
         self.reset.setObjectName("reset")
@@ -172,50 +120,78 @@ class Ui_MainWindow(object):
         self.auto_apply.clicked.connect(self.local_cropAuto)
         self.automatic.addWidget(self.auto_apply)
         self.preproc_tool.addLayout(self.automatic)
+
+######################## CROP MANUAL #####################################
         self.manual = QtWidgets.QVBoxLayout()
         self.manual.setObjectName("manual")
         self.manual_settings = QtWidgets.QGridLayout()
         self.manual_settings.setContentsMargins(10, 10, 10, 10)
         self.manual_settings.setSpacing(10)
         self.manual_settings.setObjectName("manual_settings")
-        self.x_max_box = QtWidgets.QSpinBox(self.preproc)
-        self.x_max_box.setMaximum(10000)
-        self.x_max_box.setObjectName("x_max_box")
-        self.x_max_box.valueChanged.connect(self.add_xmax)
-        self.manual_settings.addWidget(self.x_max_box, 1, 1, 1, 1)
-        self.y_max_box = QtWidgets.QSpinBox(self.preproc)
-        self.y_max_box.setObjectName("y_max_box")
-        self.y_max_box.valueChanged.connect(self.add_ymax)
-        self.manual_settings.addWidget(self.y_max_box, 1, 3, 1, 1)
-        self.x_min_box = QtWidgets.QSpinBox(self.preproc)
-        self.x_min_box.setMaximum(10000)
-        self.x_min_box.setObjectName("x_min_box")
-        self.x_min_box.valueChanged.connect(self.add_xmin)
-        self.manual_settings.addWidget(self.x_min_box, 0, 1, 1, 1)
-        self.y_min = QtWidgets.QLabel(self.preproc)
-        self.y_min.setAlignment(QtCore.Qt.AlignCenter)
-        self.y_min.setObjectName("y_min")
-        self.manual_settings.addWidget(self.y_min, 0, 2, 1, 1)
+
+        # x min
         self.x_min = QtWidgets.QLabel(self.preproc)
         self.x_min.setAlignment(QtCore.Qt.AlignCenter)
         self.x_min.setObjectName("x_min")
         self.manual_settings.addWidget(self.x_min, 0, 0, 1, 1)
+
+        self.x_min_box = QtWidgets.QSpinBox(self.preproc)
+        self.x_min_box.setSingleStep(10)
+        self.x_min_box.setMaximum(10000)
+        self.x_min_box.setObjectName("x_min_box")
+        self.x_min_box.valueChanged.connect(self.add_x_min_line)
+        self.x_min_box.setAccelerated(True)
+        self.manual_settings.addWidget(self.x_min_box, 0, 1, 1, 1)
+
+        # x max
         self.x_max = QtWidgets.QLabel(self.preproc)
         self.x_max.setAlignment(QtCore.Qt.AlignCenter)
         self.x_max.setObjectName("x_max")
         self.manual_settings.addWidget(self.x_max, 1, 0, 1, 1)
+
+        self.x_max_box = QtWidgets.QSpinBox(self.preproc)
+        self.x_max_box.setSingleStep(10)
+        self.x_max_box.setMaximum(10000)
+        self.x_max_box.setObjectName("x_max_box")
+        self.x_max_box.valueChanged.connect(self.add_x_max_line)
+        self.x_max_box.setAccelerated(True)
+        self.manual_settings.addWidget(self.x_max_box, 1, 1, 1, 1)
+
+        # y min
+        self.y_min = QtWidgets.QLabel(self.preproc)
+        self.y_min.setAlignment(QtCore.Qt.AlignCenter)
+        self.y_min.setObjectName("y_min")
+        self.manual_settings.addWidget(self.y_min, 0, 2, 1, 1)
+
         self.y_min_box = QtWidgets.QSpinBox(self.preproc)
+        self.y_min_box.setSingleStep(10)
+        self.y_min_box.setMaximum(10000)
         self.y_min_box.setObjectName("y_min_box")
-        self.y_min_box.valueChanged.connect(self.add_ymin)
+        self.y_min_box.valueChanged.connect(self.add_y_min_line)
+        self.y_min_box.setAccelerated(True)
         self.manual_settings.addWidget(self.y_min_box, 0, 3, 1, 1)
+
+        # y max
         self.y_max = QtWidgets.QLabel(self.preproc)
         self.y_max.setAlignment(QtCore.Qt.AlignCenter)
         self.y_max.setObjectName("y_max")
         self.manual_settings.addWidget(self.y_max, 1, 2, 1, 1)
+
+        self.y_max_box = QtWidgets.QSpinBox(self.preproc)
+        self.y_max_box.setSingleStep(10)
+        self.y_max_box.setMaximum(10000)
+        self.y_max_box.setObjectName("y_max_box")
+        self.y_max_box.valueChanged.connect(self.add_y_max_line)
+        self.y_max_box.setAccelerated(True)
+        self.manual_settings.addWidget(self.y_max_box, 1, 3, 1, 1)
+
+        ################################################
         self.manual.addLayout(self.manual_settings)
         self.manual_apply = QtWidgets.QPushButton(self.preproc)
         self.manual_apply.setObjectName("manual_apply")
+        self.manual_apply.clicked.connect(self.manual_crop)
         self.manual.addWidget(self.manual_apply)
+
         self.preproc_tool.addLayout(self.manual)
         self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.preproc_tool)
         self.preproc_confirm = QtWidgets.QHBoxLayout()
@@ -308,6 +284,10 @@ class Ui_MainWindow(object):
         self.timer = QtCore.QTimer(interval=1000, timeout=self.update_usages)
         self.timer.start()
 
+
+
+        MainWindow.showMaximized()
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -340,9 +320,11 @@ class Ui_MainWindow(object):
     
     def change_page_1(self):
         self.browser.setCurrentIndex(0)
+        self.set_image_from_cv()
 
     def change_page_2(self):
         self.browser.setCurrentIndex(1)
+        self.set_image_from_cv()
 
     def change_page_3(self):
         self.browser.setCurrentIndex(2)
@@ -368,26 +350,60 @@ class Ui_MainWindow(object):
         self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
 
     def update_usages(self):
-        self.cpu_bar.setValue(psutil.cpu_percent())
-        self.ram_bar.setValue(psutil.virtual_memory().percent)
+        self.cpu_bar.setValue(int(psutil.cpu_percent()))
+        self.ram_bar.setValue(int(psutil.virtual_memory().percent))
     
     def local_cropAuto(self):
         self.loadimage()
         self.image = utils.cropAuto(self.image, self.threshold_box.value())
         self.set_image_from_cv()
 
-    def add_xmax(self):
-        self.image = cv2.line(self.image, (self.x_max_box.value(), 0), (self.x_max_box.value(), self.image.shape[0]), (255, 0, 0), 2) 
-        self.set_image_from_cv()
+    def add_x_max_line(self):
+        try:
+            if len(self.preproc_viewer.scene().items()) > 1:
+                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
+            self.preproc_viewer.scene().addLine(self.x_max_box.value(), 0, self.x_max_box.value(), self.image.shape[0], pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
+        except:
+            pass
 
-    def add_xmin(self):
-        print('xmin')
+    def add_x_min_line(self):
+        try:
+            if len(self.preproc_viewer.scene().items()) > 1:
+                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
+            self.preproc_viewer.scene().addLine(self.x_min_box.value(), 0, self.x_min_box.value(), self.image.shape[0], pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
+        except:
+            pass
 
-    def add_ymax(self):
-        print('')
+    def add_y_max_line(self):
+        try:
+            if len(self.preproc_viewer.scene().items()) > 1:
+                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
+            self.preproc_viewer.scene().addLine(0, self.y_max_box.value(), self.image.shape[1], self.y_max_box.value(), pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
+        except:
+            pass
 
-    def add_ymin(self):
-        print('xmin')
+    def add_y_min_line(self):
+        try:
+            if len(self.preproc_viewer.scene().items()) > 1:
+                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
+            self.preproc_viewer.scene().addLine(0, self.y_min_box.value(), self.image.shape[1], self.y_min_box.value(), pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
+        except:
+            pass
+    
+    def manual_crop(self):
+        try:
+            if len(self.preproc_viewer.scene().items()) > 1:
+                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
+            self.loadimage()
+            self.image = self.image[self.y_min_box.value() : self.y_max_box.value(), self.x_min_box.value() : self.x_max_box.value()].copy()
+            x = self.image.shape[0] if self.image.shape[0] > self.image.shape[1] else self.image.shape[1]
+            while x % 32 != 0:
+                x -= 1
+            self.image = cv2.resize(self.image, (x, x), interpolation = cv2.INTER_AREA)
+            self.set_image_from_cv()
+        except:
+            pass
+
 
 if __name__ == "__main__":
     import sys
