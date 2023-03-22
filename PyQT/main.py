@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import os, cv2, psutil, ImageViewer
+import os, cv2, psutil, ImageViewer, sys
 import numpy as np
 import utils
 
@@ -7,8 +7,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1920, 1080)
+        # path = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
+        # MainWindow.setStyleSheet(f"background-image: url({path}/Fond.png);")
+
+
 
         self.image = np.zeros((0,0,0), np.uint8)
+
         # Image Viewer
         self.preproc_viewer = ImageViewer.PhotoViewer(MainWindow)
         self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
@@ -26,7 +31,7 @@ class Ui_MainWindow(object):
         self.infos.setObjectName("infos")
         self.logo = QtWidgets.QLabel(self.centralwidget)
         self.logo.setObjectName('Logo')
-        self.logo.setPixmap(QtGui.QPixmap(os.path.dirname(os.path.abspath(__file__)) + "\Logo.png"))
+        self.logo.setPixmap(QtGui.QPixmap(os.path.dirname(os.path.abspath(__file__)) + "\Assets\Logo.png"))
         self.infos.addWidget(self.logo)
         self.cpu = QtWidgets.QHBoxLayout()
         self.cpu.setObjectName("cpu")
@@ -137,7 +142,7 @@ class Ui_MainWindow(object):
 
         self.x_min_box = QtWidgets.QSpinBox(self.preproc)
         self.x_min_box.setSingleStep(10)
-        self.x_min_box.setMaximum(10000)
+        self.x_min_box.setMaximum(0)
         self.x_min_box.setObjectName("x_min_box")
         self.x_min_box.valueChanged.connect(self.add_x_min_line)
         self.x_min_box.setAccelerated(True)
@@ -151,7 +156,7 @@ class Ui_MainWindow(object):
 
         self.x_max_box = QtWidgets.QSpinBox(self.preproc)
         self.x_max_box.setSingleStep(10)
-        self.x_max_box.setMaximum(10000)
+        self.x_max_box.setMaximum(0)
         self.x_max_box.setObjectName("x_max_box")
         self.x_max_box.valueChanged.connect(self.add_x_max_line)
         self.x_max_box.setAccelerated(True)
@@ -165,7 +170,7 @@ class Ui_MainWindow(object):
 
         self.y_min_box = QtWidgets.QSpinBox(self.preproc)
         self.y_min_box.setSingleStep(10)
-        self.y_min_box.setMaximum(10000)
+        self.y_min_box.setMaximum(0)
         self.y_min_box.setObjectName("y_min_box")
         self.y_min_box.valueChanged.connect(self.add_y_min_line)
         self.y_min_box.setAccelerated(True)
@@ -179,7 +184,7 @@ class Ui_MainWindow(object):
 
         self.y_max_box = QtWidgets.QSpinBox(self.preproc)
         self.y_max_box.setSingleStep(10)
-        self.y_max_box.setMaximum(10000)
+        self.y_max_box.setMaximum(0)
         self.y_max_box.setObjectName("y_max_box")
         self.y_max_box.valueChanged.connect(self.add_y_max_line)
         self.y_max_box.setAccelerated(True)
@@ -290,7 +295,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
         self.cpu_label.setText(_translate("MainWindow", "CPU"))
         self.ram_label.setText(_translate("MainWindow", "RAM"))
         self.open.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Ouvrir un image ou un dossier</p></body></html>"))
@@ -340,6 +345,10 @@ class Ui_MainWindow(object):
     def loadimage(self):
         self.image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
         self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+        self.x_min_box.setMaximum(self.image.shape[1])
+        self.x_max_box.setMaximum(self.image.shape[1])
+        self.y_min_box.setMaximum(self.image.shape[0])
+        self.y_max_box.setMaximum(self.image.shape[0])
         self.set_image_from_cv()
 
     def set_image_from_cv (self):
@@ -406,60 +415,33 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    import sys
+
+    path = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
+
     app = QtWidgets.QApplication(sys.argv)
 
     app.setStyle('Fusion')
 
-    app.setWindowIcon(QtGui.QIcon(os.path.dirname(os.path.abspath(__file__)) + "\Image.png"))
+    app.setWindowIcon(QtGui.QIcon(path + "/Assets/Logo_small.png"))
 
-    # app.setStyleSheet("""
-    #                     QMainWindow {
-    #                         background-color: #0e2f44;
-    #                     }
-    #                     QDialog {
-    #                         background-color: #0e2f44;
-    #                     }
-    #                     QLabel {
-    #                         color: #afeeee;
-    #                         font-family: "Bahnschrift";
-    #                     }
-    #                     QPushButton {
-    #                         color : #afeeee;
-    #                         background-color: #8b0000;
-    #                         border-style: outset;
-    #                         border-width: 2px;
-    #                         border-radius: 10px;
-    #                         border-color: #6897bb;
-    #                         font: bold 16px;
-    #                         min-width: 5em;
-    #                         padding: 6px;
-    #                     }
-    #                     QPushButton:disabled {
-    #                         color : #101010;
-    #                         background-color : #101010;
-    #                     }
-    #                     QPushButton:pressed {
-    #                         background-color: #800000;
-    #                         border-style: inset;
-    #                     }
-    #                     QSpinBox {
-    #                         background-color: #6897bb;
-    #                     }
-    #                     QComboBox {
-    #                         background-color: #6897bb;
-    #                     }
-    #                     QTextBrowser{
-    #                         background-color: #6897bb;
-    #                     }
-    #                     QTextEdit {
-    #                         background-color: #6897bb;
-    #                     }
-    #                     QLineEdit {
-    #                         background-color: #6897bb;
-    #                     }
-
-    #                 """)
+    app.setStyleSheet(f"""
+                        QMainWindow {{
+                            background-image: url({path}/Assets/Fond.png);
+                        }}
+                        QLabel {{
+                        
+                        }}
+                        QPushButton {{
+                        }}
+                        QPushButton:disabled {{
+                        }}
+                        QPushButton:pressed {{
+                        }}
+                        QSpinBox {{
+                        }}
+                        QComboBox {{
+                        }}
+                    """)
 
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
