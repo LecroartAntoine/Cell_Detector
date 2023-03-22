@@ -6,11 +6,7 @@ import utils
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1920, 1080)
-        # path = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
-        # MainWindow.setStyleSheet(f"background-image: url({path}/Fond.png);")
-
-
+        MainWindow.resize(1200, 800)
 
         self.image = np.zeros((0,0,0), np.uint8)
 
@@ -18,7 +14,7 @@ class Ui_MainWindow(object):
         self.preproc_viewer = ImageViewer.PhotoViewer(MainWindow)
         self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
 
-        # Main window layout
+        # Main window
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.formLayout = QtWidgets.QFormLayout(self.centralwidget)
@@ -84,16 +80,24 @@ class Ui_MainWindow(object):
         self.files.currentRowChanged.connect(self.loadimage)
         self.menu.addWidget(self.files)
         self.formLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.menu)
+
+
+#####################################  Browser  ########################################################
         self.browser = QtWidgets.QStackedWidget(self.centralwidget)
         self.browser.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.browser.setFrameShadow(QtWidgets.QFrame.Plain)
         self.browser.setObjectName("browser")
+        self.browser.setCurrentIndex(0)
+
+#####################################  Preprocessing  ########################################################
         self.preproc = QtWidgets.QWidget()
         self.preproc.setObjectName("preproc")
         self.formLayout_2 = QtWidgets.QFormLayout(self.preproc)
         self.formLayout_2.setObjectName("formLayout_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+
+#####################################  Auto crop  ########################################################
         self.auto_label = QtWidgets.QLabel(self.preproc)
         self.auto_label.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.auto_label.setAlignment(QtCore.Qt.AlignCenter)
@@ -126,7 +130,7 @@ class Ui_MainWindow(object):
         self.automatic.addWidget(self.auto_apply)
         self.preproc_tool.addLayout(self.automatic)
 
-######################## CROP MANUAL #####################################
+######################## Manual crop #####################################
         self.manual = QtWidgets.QVBoxLayout()
         self.manual.setObjectName("manual")
         self.manual_settings = QtWidgets.QGridLayout()
@@ -139,7 +143,6 @@ class Ui_MainWindow(object):
         self.x_min.setAlignment(QtCore.Qt.AlignCenter)
         self.x_min.setObjectName("x_min")
         self.manual_settings.addWidget(self.x_min, 0, 0, 1, 1)
-
         self.x_min_box = QtWidgets.QSpinBox(self.preproc)
         self.x_min_box.setSingleStep(10)
         self.x_min_box.setMaximum(0)
@@ -153,7 +156,6 @@ class Ui_MainWindow(object):
         self.x_max.setAlignment(QtCore.Qt.AlignCenter)
         self.x_max.setObjectName("x_max")
         self.manual_settings.addWidget(self.x_max, 1, 0, 1, 1)
-
         self.x_max_box = QtWidgets.QSpinBox(self.preproc)
         self.x_max_box.setSingleStep(10)
         self.x_max_box.setMaximum(0)
@@ -167,7 +169,6 @@ class Ui_MainWindow(object):
         self.y_min.setAlignment(QtCore.Qt.AlignCenter)
         self.y_min.setObjectName("y_min")
         self.manual_settings.addWidget(self.y_min, 0, 2, 1, 1)
-
         self.y_min_box = QtWidgets.QSpinBox(self.preproc)
         self.y_min_box.setSingleStep(10)
         self.y_min_box.setMaximum(0)
@@ -181,7 +182,6 @@ class Ui_MainWindow(object):
         self.y_max.setAlignment(QtCore.Qt.AlignCenter)
         self.y_max.setObjectName("y_max")
         self.manual_settings.addWidget(self.y_max, 1, 2, 1, 1)
-
         self.y_max_box = QtWidgets.QSpinBox(self.preproc)
         self.y_max_box.setSingleStep(10)
         self.y_max_box.setMaximum(0)
@@ -190,32 +190,26 @@ class Ui_MainWindow(object):
         self.y_max_box.setAccelerated(True)
         self.manual_settings.addWidget(self.y_max_box, 1, 3, 1, 1)
 
-        ################################################
+
         self.manual.addLayout(self.manual_settings)
         self.manual_apply = QtWidgets.QPushButton(self.preproc)
         self.manual_apply.setObjectName("manual_apply")
         self.manual_apply.clicked.connect(self.manual_crop)
         self.manual.addWidget(self.manual_apply)
-
         self.preproc_tool.addLayout(self.manual)
+
         self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.preproc_tool)
-        self.preproc_confirm = QtWidgets.QHBoxLayout()
-        self.preproc_confirm.setObjectName("preproc_confirm")
-        self.preproc_accept = QtWidgets.QPushButton(self.preproc)
-        self.preproc_accept.setObjectName("preproc_accept")
-        self.preproc_confirm.addWidget(self.preproc_accept)
-        self.preproc_reset = QtWidgets.QPushButton(self.preproc)
-        self.preproc_reset.setObjectName("preproc_reset")
-        self.preproc_confirm.addWidget(self.preproc_reset)
-        self.formLayout_2.setLayout(3, QtWidgets.QFormLayout.FieldRole, self.preproc_confirm)
         self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.preproc_viewer)
         self.browser.addWidget(self.preproc)
+
+#####################################  Yolo detect  ########################################################
         self.detect = QtWidgets.QWidget()
         self.detect.setObjectName("detect_2")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.detect)
         self.verticalLayout.setObjectName("verticalLayout")
         self.detect_tool = QtWidgets.QHBoxLayout()
         self.detect_tool.setObjectName("detect_tool")
+
         self.detect_model = QtWidgets.QHBoxLayout()
         self.detect_model.setObjectName("detect_model")
         self.choose_model_label = QtWidgets.QLabel(self.detect)
@@ -229,7 +223,9 @@ class Ui_MainWindow(object):
         self.choose_model.setFrame(True)
         self.choose_model.setObjectName("choose_model")
         self.choose_model.addItem("")
+        self.choose_model.setCurrentIndex(0)
         self.detect_model.addWidget(self.choose_model)
+
         self.detect_tool.addLayout(self.detect_model)
         self.detect_conf = QtWidgets.QGridLayout()
         self.detect_conf.setObjectName("detect_conf")
@@ -266,13 +262,19 @@ class Ui_MainWindow(object):
         self.start_detect = QtWidgets.QPushButton(self.detect)
         self.start_detect.setObjectName("start_detect")
         self.detect_tool.addWidget(self.start_detect)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.detect_tool.addItem(spacerItem)
         self.verticalLayout.addLayout(self.detect_tool)
         self.verticalLayout.addWidget(self.detect_viewer)
+
+
         self.browser.addWidget(self.detect)
         self.calculs = QtWidgets.QWidget()
         self.calculs.setObjectName("calculs")
         self.browser.addWidget(self.calculs)
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.browser)
+
+#####################################  div  ########################################################
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1092, 21))
@@ -283,22 +285,18 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.browser.setCurrentIndex(0)
-        self.choose_model.setCurrentIndex(0)
+
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.timer = QtCore.QTimer(interval=1000, timeout=self.update_usages)
         self.timer.start()
-
-
 
         MainWindow.showMaximized()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
+        # MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
         self.cpu_label.setText(_translate("MainWindow", "CPU"))
         self.ram_label.setText(_translate("MainWindow", "RAM"))
-        self.open.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Ouvrir un image ou un dossier</p></body></html>"))
         self.open.setText(_translate("MainWindow", "Ouvrir"))
         self.prepoc_button.setText(_translate("MainWindow", "Prétraitement"))
         self.detection_button.setText(_translate("MainWindow", "Détéction"))
@@ -313,8 +311,6 @@ class Ui_MainWindow(object):
         self.x_max.setText(_translate("MainWindow", "X Max"))
         self.y_max.setText(_translate("MainWindow", "Y Max"))
         self.manual_apply.setText(_translate("MainWindow", "Appliquer"))
-        self.preproc_accept.setText(_translate("MainWindow", "Confirmer"))
-        self.preproc_reset.setText(_translate("MainWindow", "Annuler"))
         self.choose_model_label.setText(_translate("MainWindow", "Choix du modèle"))
         self.choose_model.setItemText(0, _translate("MainWindow", "1.0"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
