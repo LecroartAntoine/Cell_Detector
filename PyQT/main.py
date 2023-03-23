@@ -27,7 +27,7 @@ class Ui_MainWindow(object):
         self.infos.setObjectName("infos")
         self.logo = QtWidgets.QLabel(self.centralwidget)
         self.logo.setObjectName('Logo')
-        self.logo.setPixmap(QtGui.QPixmap(os.path.dirname(os.path.abspath(__file__)) + "\Assets\Logo.png"))
+        self.logo.setPixmap(QtGui.QPixmap("Assets:Logo.png"))
         self.infos.addWidget(self.logo)
         self.cpu = QtWidgets.QHBoxLayout()
         self.cpu.setObjectName("cpu")
@@ -209,7 +209,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.detect_tool = QtWidgets.QHBoxLayout()
         self.detect_tool.setObjectName("detect_tool")
-
+        self.detect_tool.setSpacing(20)
         self.detect_model = QtWidgets.QHBoxLayout()
         self.detect_model.setObjectName("detect_model")
         self.choose_model_label = QtWidgets.QLabel(self.detect)
@@ -227,27 +227,31 @@ class Ui_MainWindow(object):
         self.detect_model.addWidget(self.choose_model)
 
         self.detect_tool.addLayout(self.detect_model)
-        self.detect_conf = QtWidgets.QGridLayout()
-        self.detect_conf.setObjectName("detect_conf")
-        self.show_conf = QtWidgets.QRadioButton(self.detect)
-        self.show_conf.setText("")
-        self.show_conf.setChecked(True)
-        self.show_conf.setObjectName("show_conf")
-        self.detect_conf.addWidget(self.show_conf, 1, 1, 1, 1)
+        self.show_conf_layout = QtWidgets.QHBoxLayout()
+        self.show_conf_layout.setObjectName("show_conf_layout")
         self.show_conf_label = QtWidgets.QLabel(self.detect)
         self.show_conf_label.setObjectName("show_conf_label")
-        self.detect_conf.addWidget(self.show_conf_label, 1, 0, 1, 1)
+        self.show_conf_layout.addWidget(self.show_conf_label)
+        self.show_conf = QtWidgets.QRadioButton(self.detect)
+        # self.show_conf.setText("")
+        self.show_conf.setChecked(True)
+        self.show_conf.setObjectName("show_conf")
+        self.show_conf_layout.addWidget(self.show_conf)
+        self.detect_tool.addLayout(self.show_conf_layout)
+
+        self.taux_conf_layout  = QtWidgets.QHBoxLayout()
+        self.taux_conf_layout.setObjectName("taux_conf_layout")
         self.taux_conf_label = QtWidgets.QLabel(self.detect)
         self.taux_conf_label.setObjectName("taux_conf_label")
-        self.detect_conf.addWidget(self.taux_conf_label, 0, 0, 1, 1)
+        self.taux_conf_layout.addWidget(self.taux_conf_label)
         self.taux_conf = QtWidgets.QDoubleSpinBox(self.detect)
         self.taux_conf.setDecimals(1)
         self.taux_conf.setMaximum(100.0)
         self.taux_conf.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
         self.taux_conf.setProperty("value", 95.0)
         self.taux_conf.setObjectName("taux_conf")
-        self.detect_conf.addWidget(self.taux_conf, 0, 1, 1, 1)
-        self.detect_tool.addLayout(self.detect_conf)
+        self.taux_conf_layout.addWidget(self.taux_conf)
+        self.detect_tool.addLayout(self.taux_conf_layout)
         self.detect_box = QtWidgets.QHBoxLayout()
         self.detect_box.setObjectName("detect_box")
         self.box_width_label = QtWidgets.QLabel(self.detect)
@@ -415,33 +419,16 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-
-    path = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
+   
+    QtCore.QDir.addSearchPath('Assets', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Assets'))
 
     app = QtWidgets.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon("Assets:Logo_small.png"))
 
-    app.setStyle('Fusion')
+    file = QtCore.QFile('Assets:Style.qss')
+    file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
 
-    app.setWindowIcon(QtGui.QIcon(path + "/Assets/Logo_small.png"))
-
-    app.setStyleSheet(f"""
-                        QMainWindow {{
-                            background-image: url({path}/Assets/Fond.png);
-                        }}
-                        QLabel {{
-                        
-                        }}
-                        QPushButton {{
-                        }}
-                        QPushButton:disabled {{
-                        }}
-                        QPushButton:pressed {{
-                        }}
-                        QSpinBox {{
-                        }}
-                        QComboBox {{
-                        }}
-                    """)
+    app.setStyleSheet(str(file.readAll(), 'utf-8'))
 
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
