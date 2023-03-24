@@ -126,7 +126,7 @@ QToolTip
 /*-----QPushButton-----*/
 QPushButton
 {
-	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(158, 200, 171, 255),stop:1 rgba(16, 165, 107, 255));
+	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(158, 200, 171, 255),stop:1 rgba(16, 165, 107, 100));
 	color: #ffffff;
 	border-style: solid;
 	border-width: 1px;
