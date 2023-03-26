@@ -105,3 +105,29 @@ def box_label(image, box, label, color, thickness, txt_color=(255, 255, 255)):
                     lineType=cv2.LINE_AA)
     
     return image
+
+def show_all_detections(image, pred):
+
+    liste_images = []
+    liste_images_h = []
+    nb_image = len(pred.boxes.boxes)
+    fill = np.zeros((50, 50, 3), dtype = "uint8")
+
+
+    for box in pred.boxes.boxes:
+
+        cell = image[int(box[1]):int(box[3]), int(box[0]):int(box[2])]
+        cell = cv2.resize(cell, (50, 50), interpolation=cv2.INTER_AREA)
+        liste_images.append(cell)
+
+    while int(nb_image**0.5)**2 != nb_image:
+        liste_images.append(fill)
+        nb_image += 1
+
+    for i in range(0, nb_image, int(nb_image**0.5)):
+
+        liste_images_h.append(cv2.hconcat(liste_images[i:i+int(nb_image**0.5)]))
+        
+    image_combin = cv2.vconcat(liste_images_h)
+
+    return image_combin

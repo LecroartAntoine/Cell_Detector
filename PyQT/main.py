@@ -13,13 +13,14 @@ class Ui_MainWindow(object):
         # Image Viewer
         self.preproc_viewer = ImageViewer.PhotoViewer(MainWindow)
         self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
+        self.analyse_viewer = ImageViewer.PhotoViewer(MainWindow)
 
         # Main window
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.formLayout = QtWidgets.QFormLayout(self.centralwidget)
-        self.formLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
-        self.formLayout.setObjectName("formLayout")
+        self.mainLayout = QtWidgets.QFormLayout(self.centralwidget)
+        self.mainLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
+        self.mainLayout.setObjectName("mainLayout")
 
 #####################################  Infos  ########################################################
         self.infos = QtWidgets.QHBoxLayout()
@@ -49,65 +50,90 @@ class Ui_MainWindow(object):
         self.ram_bar.setObjectName("ram_bar")
         self.ram.addWidget(self.ram_bar)
         self.infos.addLayout(self.ram)
-        self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
+        self.mainLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
 
 #################################  MENU  ##################################################
         self.menu = QtWidgets.QVBoxLayout()
         self.menu.setContentsMargins(15, -1, 15, -1)
         self.menu.setObjectName("menu")
+
         self.open = QtWidgets.QPushButton(self.centralwidget)
         self.open.setObjectName("open")
         self.open.clicked.connect(self.openfile)
         self.menu.addWidget(self.open)
+
         self.prepoc_button = QtWidgets.QPushButton(self.centralwidget)
         self.prepoc_button.setObjectName("prepoc_button")
         self.prepoc_button.clicked.connect(self.change_page_1)
+        self.prepoc_button.setEnabled(False)
         self.menu.addWidget(self.prepoc_button)
+
         self.detection_button = QtWidgets.QPushButton(self.centralwidget)
         self.detection_button.setObjectName("detection_button")
         self.detection_button.clicked.connect(self.change_page_2)
+        self.detection_button.setEnabled(False)
         self.menu.addWidget(self.detection_button)
-        self.calc_button = QtWidgets.QPushButton(self.centralwidget)
-        self.calc_button.setObjectName("calc_button")
-        self.calc_button.clicked.connect(self.change_page_3)
-        self.calc_button.setEnabled(False)
-        self.menu.addWidget(self.calc_button)
+
+        self.analyse_button = QtWidgets.QPushButton(self.centralwidget)
+        self.analyse_button.setObjectName("analyse_button")
+        self.analyse_button.clicked.connect(self.change_page_3)
+        self.analyse_button.setEnabled(False)
+        self.menu.addWidget(self.analyse_button)
+
         self.reset = QtWidgets.QPushButton(self.centralwidget)
         self.reset.setObjectName("reset")
+        self.reset.setEnabled(False)
         self.menu.addWidget(self.reset)
+
         self.files = QtWidgets.QListWidget(self.centralwidget)
         self.files.setObjectName("files")
         self.files.currentRowChanged.connect(self.loadimage)
         self.menu.addWidget(self.files)
-        self.formLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.menu)
+        self.mainLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.menu)
 
 
 #####################################  Browser  ########################################################
         self.browser = QtWidgets.QStackedWidget(self.centralwidget)
-        self.browser.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.browser.setFrameShadow(QtWidgets.QFrame.Plain)
         self.browser.setObjectName("browser")
         self.browser.setCurrentIndex(0)
+
+##################################### Welcome page ########################################################
+
+        self.welcome = QtWidgets.QWidget()
+        self.welcome.setObjectName("welcome")
+        self.welcome_layout = QtWidgets.QVBoxLayout(self.welcome)
+        self.welcome_layout.setObjectName("welcome_layout")
+
+        self.welcome_message_1 = QtWidgets.QLabel(self.welcome)
+        self.welcome_message_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.welcome_message_1.setObjectName("welcome_message_1")
+
+        self.welcome_message_2 = QtWidgets.QLabel(self.welcome)
+        self.welcome_message_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.welcome_message_2.setObjectName("welcome_message_2")
+
+        self.welcome_layout.addWidget(self.welcome_message_1)
+        self.welcome_layout.addWidget(self.welcome_message_2)
+        self.browser.addWidget(self.welcome)
 
 #####################################  Preprocessing  ########################################################
         self.preproc = QtWidgets.QWidget()
         self.preproc.setObjectName("preproc")
-        self.formLayout_2 = QtWidgets.QFormLayout(self.preproc)
-        self.formLayout_2.setObjectName("formLayout_2")
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.preproc_layout = QtWidgets.QFormLayout(self.preproc)
+        self.preproc_layout.setObjectName("preproc_layout")
+        self.preproc_tool_name_layout = QtWidgets.QHBoxLayout()
+        self.preproc_tool_name_layout.setObjectName("preproc_tool_name_layout")
 
 #####################################  Auto crop  ########################################################
         self.auto_label = QtWidgets.QLabel(self.preproc)
-        self.auto_label.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.auto_label.setAlignment(QtCore.Qt.AlignCenter)
         self.auto_label.setObjectName("auto_label")
-        self.horizontalLayout.addWidget(self.auto_label)
+        self.preproc_tool_name_layout.addWidget(self.auto_label)
         self.manual_label = QtWidgets.QLabel(self.preproc)
         self.manual_label.setAlignment(QtCore.Qt.AlignCenter)
         self.manual_label.setObjectName("manual_label")
-        self.horizontalLayout.addWidget(self.manual_label)
-        self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout)
+        self.preproc_tool_name_layout.addWidget(self.manual_label)
+        self.preproc_layout.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.preproc_tool_name_layout)
         self.preproc_tool = QtWidgets.QHBoxLayout()
         self.preproc_tool.setObjectName("preproc_tool")
         self.automatic = QtWidgets.QVBoxLayout()
@@ -198,15 +224,15 @@ class Ui_MainWindow(object):
         self.manual.addWidget(self.manual_apply)
         self.preproc_tool.addLayout(self.manual)
 
-        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.preproc_tool)
-        self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.preproc_viewer)
+        self.preproc_layout.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.preproc_tool)
+        self.preproc_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.preproc_viewer)
         self.browser.addWidget(self.preproc)
 
 #####################################  Yolo detect  ########################################################
         self.detect = QtWidgets.QWidget()
         self.detect.setObjectName("detect_2")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.detect)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.detect_layout = QtWidgets.QVBoxLayout(self.detect)
+        self.detect_layout.setObjectName("detect_layout")
         self.detect_tool = QtWidgets.QHBoxLayout()
         self.detect_tool.setObjectName("detect_tool")
         self.detect_tool.setSpacing(20)
@@ -283,15 +309,33 @@ class Ui_MainWindow(object):
         self.detect_tool.addWidget(self.start_detect)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.detect_tool.addItem(spacerItem)
-        self.verticalLayout.addLayout(self.detect_tool)
-        self.verticalLayout.addWidget(self.detect_viewer)
-
-
+        self.detect_layout.addLayout(self.detect_tool)
+        self.detect_layout.addWidget(self.detect_viewer)
         self.browser.addWidget(self.detect)
-        self.calculs = QtWidgets.QWidget()
-        self.calculs.setObjectName("calculs")
-        self.browser.addWidget(self.calculs)
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.browser)
+
+#####################################  Analyse  ########################################################
+        self.analyse = QtWidgets.QWidget()
+        self.analyse.setObjectName("analyse")
+
+        self.analyse_layout = QtWidgets.QVBoxLayout(self.analyse)
+        self.analyse_layout.setObjectName("analyse_layout")
+
+        self.analyse_tool = QtWidgets.QHBoxLayout()
+        self.analyse_tool.setObjectName("analyse_tool")
+        self.analyse_tool.setSpacing(20)
+
+        self.show_detection_button = QtWidgets.QPushButton(self.analyse)
+        self.show_detection_button.setObjectName("show_detection_button")
+        self.show_detection_button.clicked.connect(self.show_detection)
+        self.analyse_tool.addWidget(self.show_detection_button)
+        
+
+        self.analyse_layout.addLayout(self.analyse_tool)
+        self.analyse_layout.addWidget(self.analyse_viewer)
+        self.browser.addWidget(self.analyse)
+
+
+        self.mainLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.browser)
 
 #####################################  div  ########################################################
         MainWindow.setCentralWidget(self.centralwidget)
@@ -313,14 +357,16 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        # MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
         self.cpu_label.setText(_translate("MainWindow", "CPU"))
         self.ram_label.setText(_translate("MainWindow", "RAM"))
         self.open.setText(_translate("MainWindow", "Ouvrir"))
         self.prepoc_button.setText(_translate("MainWindow", "Prétraitement"))
         self.detection_button.setText(_translate("MainWindow", "Détéction"))
-        self.calc_button.setText(_translate("MainWindow", "Calculs"))
+        self.analyse_button.setText(_translate("MainWindow", "Analyse"))
         self.reset.setText(_translate("MainWindow", "Reset"))
+        self.welcome_message_1.setText(_translate("MainWindow", "Bienvenue"))
+        self.welcome_message_2.setText(_translate("MainWindow", "Veuillez ouvrir un dossier contenant vos images"))
         self.auto_label.setText(_translate("MainWindow", "Automatic"))
         self.manual_label.setText(_translate("MainWindow", "Manuel"))
         self.threshold_label.setText(_translate("MainWindow", "Valeur threshold (0 - 255)"))
@@ -338,17 +384,20 @@ class Ui_MainWindow(object):
         self.taux_conf.setSuffix(_translate("MainWindow", "%"))
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
         self.start_detect.setText(_translate("MainWindow", "Lancer la détéction"))
+        self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détéctées"))
+
     
     def change_page_1(self):
-        self.browser.setCurrentIndex(0)
+        self.browser.setCurrentIndex(1)
         self.set_image_from_cv(self.image, 1)
 
     def change_page_2(self):
-        self.browser.setCurrentIndex(1)
+        self.browser.setCurrentIndex(2)
         self.set_image_from_cv(self.image, 2)
 
     def change_page_3(self):
-        self.browser.setCurrentIndex(2)
+        self.browser.setCurrentIndex(3)
+        self.set_image_from_cv(self.image_pred, 3)
 
     def openfile(self):
         self.folder = str(QtWidgets.QFileDialog.getExistingDirectory(MainWindow, "Sélectionner un dossier"))
@@ -365,9 +414,12 @@ class Ui_MainWindow(object):
         self.x_max_box.setMaximum(self.image.shape[1])
         self.y_min_box.setMaximum(self.image.shape[0])
         self.y_max_box.setMaximum(self.image.shape[0])
-        self.set_image_from_cv(self.image, 0)
+        self.set_image_from_cv(self.image)
 
-    def set_image_from_cv (self, img, page):
+        self.prepoc_button.setEnabled(True)
+        self.detection_button.setEnabled(True)
+
+    def set_image_from_cv (self, img, page=0):
         height, width, channel = img.shape
         bytesPerLine = channel * width
         qImg = QtGui.QImage(img.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
@@ -376,9 +428,12 @@ class Ui_MainWindow(object):
             self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
         elif page == 2:
             self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
+        elif page == 3:
+            self.analyse_viewer.setPhoto(QtGui.QPixmap(qImg))
         else:
             self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
             self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
+            self.analyse_viewer.setPhoto(QtGui.QPixmap(qImg))
 
     def update_usages(self):
         self.cpu_bar.setValue(int(psutil.cpu_percent()))
@@ -442,8 +497,12 @@ class Ui_MainWindow(object):
     def get_pred(self):
         self.pred = utils.yolo_detection(self.image, self.taux_conf.value() / 100)
         self.image_pred = utils.plot_bboxes(self.image, self.pred.boxes.boxes, self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
-
         self.set_image_from_cv(self.image_pred, 2)
+        self.analyse_button.setEnabled(True)
+
+    def show_detection(self):
+        self.combined_detection = utils.show_all_detections(self.image, self.pred)
+        self.set_image_from_cv(self.combined_detection, 3)
 
 
 if __name__ == "__main__":
