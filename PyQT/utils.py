@@ -1,5 +1,6 @@
-import cv2
+import cv2, os
 import numpy as np
+from ultralytics import YOLO
 
 def cropAuto(img, thresh):
     src = img.copy()
@@ -49,3 +50,58 @@ def cropAuto(img, thresh):
         return resized
     except:
         return img
+    
+def yolo_detection(image, confiance):
+
+    model = YOLO(os.path.dirname(os.path.abspath(__file__)) + '/Assets/model.pt')
+
+    pred = model(image, conf = confiance)
+
+    return pred[0]
+
+
+def plot_bboxes(img, boxes, thickness, score=True, name=True):
+  
+    image = img.copy()
+    labels = {0: "clean", 1: "marked"}
+
+    colors = [(0, 255, 0),(255, 0, 0)]
+  
+
+    for box in boxes:
+        label = ''
+
+        if name:
+            label = labels[int(box[-1])]
+
+        if score :
+            label = label + " " + str(round(100 * float(box[-2]), 1)) + "%"
+
+        color = colors[int(box[-1])]
+
+        image = box_label(image, box, label, color, thickness)
+
+    return image
+
+
+def box_label(image, box, label, color, thickness, txt_color=(255, 255, 255)):
+    
+    p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+    cv2.rectangle(image, p1, p2, color, thickness=thickness, lineType=cv2.LINE_AA)
+
+    if label:
+        tf = max(thickness- 1, 1)  # font thickness
+        w, h = cv2.getTextSize(label, 0, fontScale=thickness / 3, thickness=tf)[0]  # text width, height
+        outside = p1[1] - h >= 3
+        p2 = p1[0] + w, p1[1] - h - 3 if outside else p1[1] + h + 3
+        cv2.rectangle(image, p1, p2, color, -1, cv2.LINE_AA)
+        cv2.putText(image,
+                    label, 
+                    (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
+                    0,
+                    thickness / 3,
+                    txt_color,
+                    thickness=tf,
+                    lineType=cv2.LINE_AA)
+    
+    return image

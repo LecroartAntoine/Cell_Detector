@@ -225,30 +225,44 @@ class Ui_MainWindow(object):
         self.choose_model.addItem("")
         self.choose_model.setCurrentIndex(0)
         self.detect_model.addWidget(self.choose_model)
-
         self.detect_tool.addLayout(self.detect_model)
+
         self.show_conf_layout = QtWidgets.QHBoxLayout()
         self.show_conf_layout.setObjectName("show_conf_layout")
         self.show_conf_label = QtWidgets.QLabel(self.detect)
         self.show_conf_label.setObjectName("show_conf_label")
         self.show_conf_layout.addWidget(self.show_conf_label)
         self.show_conf = QtWidgets.QRadioButton(self.detect)
-        # self.show_conf.setText("")
-        self.show_conf.setChecked(True)
         self.show_conf.setObjectName("show_conf")
         self.show_conf_layout.addWidget(self.show_conf)
         self.detect_tool.addLayout(self.show_conf_layout)
+
+        self.show_name_layout = QtWidgets.QHBoxLayout()
+        self.show_name_layout.setObjectName("show_name_layout")
+        self.show_name_label = QtWidgets.QLabel(self.detect)
+        self.show_name_label.setObjectName("show_name_label")
+        self.show_name_layout.addWidget(self.show_name_label)
+        self.show_name = QtWidgets.QRadioButton(self.detect)
+        self.show_name.setObjectName("show_name")
+        self.show_name_layout.addWidget(self.show_name)
+        self.detect_tool.addLayout(self.show_name_layout)
+
+        self.group = QtWidgets.QButtonGroup()
+        self.group.addButton(self.show_conf)
+        self.group.addButton(self.show_name)       
+        self.group.setExclusive(False)
+        self.show_name.setChecked(True)
+        self.show_conf.setChecked(True)
 
         self.taux_conf_layout  = QtWidgets.QHBoxLayout()
         self.taux_conf_layout.setObjectName("taux_conf_layout")
         self.taux_conf_label = QtWidgets.QLabel(self.detect)
         self.taux_conf_label.setObjectName("taux_conf_label")
         self.taux_conf_layout.addWidget(self.taux_conf_label)
-        self.taux_conf = QtWidgets.QDoubleSpinBox(self.detect)
-        self.taux_conf.setDecimals(1)
-        self.taux_conf.setMaximum(100.0)
-        self.taux_conf.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-        self.taux_conf.setProperty("value", 95.0)
+        self.taux_conf = QtWidgets.QSpinBox(self.detect)
+        self.taux_conf.setMaximum(100)
+        self.taux_conf.setAccelerated(True)
+        self.taux_conf.setProperty("value", 95)
         self.taux_conf.setObjectName("taux_conf")
         self.taux_conf_layout.addWidget(self.taux_conf)
         self.detect_tool.addLayout(self.taux_conf_layout)
@@ -257,14 +271,15 @@ class Ui_MainWindow(object):
         self.box_width_label = QtWidgets.QLabel(self.detect)
         self.box_width_label.setObjectName("box_width_label")
         self.detect_box.addWidget(self.box_width_label)
-        self.box_width = QtWidgets.QDoubleSpinBox(self.detect)
-        self.box_width.setDecimals(1)
-        self.box_width.setProperty("value", 1.0)
+        self.box_width = QtWidgets.QSpinBox(self.detect)
+        self.box_width.setProperty("value", 1)
         self.box_width.setObjectName("box_width")
+
         self.detect_box.addWidget(self.box_width)
         self.detect_tool.addLayout(self.detect_box)
         self.start_detect = QtWidgets.QPushButton(self.detect)
         self.start_detect.setObjectName("start_detect")
+        self.start_detect.clicked.connect(self.get_pred)
         self.detect_tool.addWidget(self.start_detect)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.detect_tool.addItem(spacerItem)
@@ -318,6 +333,7 @@ class Ui_MainWindow(object):
         self.choose_model_label.setText(_translate("MainWindow", "Choix du modèle"))
         self.choose_model.setItemText(0, _translate("MainWindow", "1.0"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
+        self.show_name_label.setText(_translate("MainWindow", "Montrer le nom du label"))
         self.taux_conf_label.setText(_translate("MainWindow", "Intervalle de confiance"))
         self.taux_conf.setSuffix(_translate("MainWindow", "%"))
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
@@ -325,11 +341,11 @@ class Ui_MainWindow(object):
     
     def change_page_1(self):
         self.browser.setCurrentIndex(0)
-        self.set_image_from_cv()
+        self.set_image_from_cv(self.image, 1)
 
     def change_page_2(self):
         self.browser.setCurrentIndex(1)
-        self.set_image_from_cv()
+        self.set_image_from_cv(self.image, 2)
 
     def change_page_3(self):
         self.browser.setCurrentIndex(2)
@@ -349,14 +365,20 @@ class Ui_MainWindow(object):
         self.x_max_box.setMaximum(self.image.shape[1])
         self.y_min_box.setMaximum(self.image.shape[0])
         self.y_max_box.setMaximum(self.image.shape[0])
-        self.set_image_from_cv()
+        self.set_image_from_cv(self.image, 0)
 
-    def set_image_from_cv (self):
-        height, width, channel = self.image.shape
+    def set_image_from_cv (self, img, page):
+        height, width, channel = img.shape
         bytesPerLine = channel * width
-        qImg = QtGui.QImage(self.image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
-        self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
-        self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
+        qImg = QtGui.QImage(img.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
+
+        if page == 1:
+            self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
+        elif page == 2:
+            self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
+        else:
+            self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
+            self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
 
     def update_usages(self):
         self.cpu_bar.setValue(int(psutil.cpu_percent()))
@@ -366,7 +388,7 @@ class Ui_MainWindow(object):
         try:
             self.loadimage()
             self.image = utils.cropAuto(self.image, self.threshold_box.value())
-            self.set_image_from_cv()
+            self.set_image_from_cv(self.image, 1)
         except:
             pass
 
@@ -413,15 +435,20 @@ class Ui_MainWindow(object):
             while x % 32 != 0:
                 x -= 1
             self.image = cv2.resize(self.image, (x, x), interpolation = cv2.INTER_AREA)
-            self.set_image_from_cv()
+            self.set_image_from_cv(self.image, 1)
         except:
             pass
+
+    def get_pred(self):
+        self.pred = utils.yolo_detection(self.image, self.taux_conf.value() / 100)
+        self.image_pred = utils.plot_bboxes(self.image, self.pred.boxes.boxes, self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
+
+        self.set_image_from_cv(self.image_pred, 2)
 
 
 if __name__ == "__main__":
    
     QtCore.QDir.addSearchPath('Assets', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Assets'))
-
     app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("Assets:Logo_small.png"))
 
@@ -429,7 +456,7 @@ if __name__ == "__main__":
     file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
 
     app.setStyleSheet(str(file.readAll(), 'utf-8'))
-
+    
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
