@@ -171,3 +171,21 @@ def calcul_malassez(image, pred):
     concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)*0.00001)) * DILUTION
 
     return (concentration_clean, concentration_dirty)
+
+def calcul_recouvrement(image, pred):
+    liste_dirty_cell_avg_black = []
+    liste_detection = pred.boxes.boxes
+    image_bw = image
+
+    for box in liste_detection[:]:
+        if box[-1] == 1:
+            select = image_bw[box[1]:box[3], box[0]:box[2]].copy()
+            row_avg = []
+            for row in select :
+                row_avg.append(sum(row) / len(row))
+
+            liste_dirty_cell_avg_black.append(sum(row_avg) / len(row_avg))
+
+    return(sum(liste_dirty_cell_avg_black) / len(liste_dirty_cell_avg_black))
+            
+

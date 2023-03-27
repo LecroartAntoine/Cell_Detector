@@ -5,6 +5,11 @@ QMainWindow {
 	background-image: url(Assets:Fond.jpg);
 }
 
+/*-----QProgressDialog-----*/
+QProgressDialog {
+	background-image: url(Assets:Fond.jpg);
+}
+
 /*-----QLabel-----*/
 QLabel
 {
@@ -1006,7 +1011,7 @@ QDial::disabled
 QScrollBar:horizontal
 {
     border: 1px solid #222222;
-    background-color: #3d3d3d;
+    background-color: #242F62;
     height: 13px;
     margin: 0px 16px 0 16px;
 
@@ -1068,7 +1073,7 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
 
 QScrollBar:vertical
 {
-    background-color: #3d3d3d;
+    background-color: #242F62;
     width: 13px;
     margin: 16px 0 16px 0;
     border: 1px solid #222222;
@@ -1108,7 +1113,6 @@ QScrollBar::sub-line:vertical
 
 QScrollBar::up-arrow:vertical
 {
-    image: url(://arrow-up.png);
     width: 6px;
     height: 6px;
 
@@ -1117,7 +1121,6 @@ QScrollBar::up-arrow:vertical
 
 QScrollBar::down-arrow:vertical
 {
-    image: url(://arrow-down.png);
     width: 6px;
     height: 6px;
 

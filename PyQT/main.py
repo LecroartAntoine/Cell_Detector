@@ -3,6 +3,22 @@ import os, cv2, psutil, ImageViewer, sys
 import numpy as np
 import utils
 
+class DetectThread(QtCore.QThread):
+    finished = QtCore.pyqtSignal(object)
+
+    def __init__(self, image, taux_conf, box_width, show_conf, show_name, parent=None):
+        super().__init__(parent)
+        self.image = image
+        self.taux_conf = taux_conf
+        self.box_width = box_width
+        self.show_conf = show_conf
+        self.show_name = show_name
+
+    def run(self):
+        pred = utils.yolo_detection(self.image, self.taux_conf / 100)
+        image_pred = utils.plot_bboxes(self.image, pred.boxes.boxes, self.box_width, self.show_conf, self.show_name)
+        self.finished.emit((pred, image_pred))
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -357,14 +373,14 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "a batiser"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "à baptiser"))
         self.cpu_label.setText(_translate("MainWindow", "CPU"))
         self.ram_label.setText(_translate("MainWindow", "RAM"))
         self.open.setText(_translate("MainWindow", "Ouvrir"))
         self.prepoc_button.setText(_translate("MainWindow", "Prétraitement"))
-        self.detection_button.setText(_translate("MainWindow", "Détéction"))
+        self.detection_button.setText(_translate("MainWindow", "Détection"))
         self.analyse_button.setText(_translate("MainWindow", "Analyse"))
-        self.reset.setText(_translate("MainWindow", "Reset"))
+        self.reset.setText(_translate("MainWindow", ""))
         self.welcome_message_1.setText(_translate("MainWindow", "Bienvenue"))
         self.welcome_message_2.setText(_translate("MainWindow", "Veuillez ouvrir un dossier contenant vos images"))
         self.auto_label.setText(_translate("MainWindow", "Automatic"))
@@ -383,8 +399,8 @@ class Ui_MainWindow(object):
         self.taux_conf_label.setText(_translate("MainWindow", "Intervalle de confiance"))
         self.taux_conf.setSuffix(_translate("MainWindow", "%"))
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
-        self.start_detect.setText(_translate("MainWindow", "Lancer la détéction"))
-        self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détéctées"))
+        self.start_detect.setText(_translate("MainWindow", "Lancer la détection"))
+        self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détectées"))
 
     
     def change_page_1(self):
@@ -500,8 +516,20 @@ class Ui_MainWindow(object):
             pass
 
     def get_pred(self):
-        self.pred = utils.yolo_detection(self.image, self.taux_conf.value() / 100)
-        self.image_pred = utils.plot_bboxes(self.image, self.pred.boxes.boxes, self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
+        
+        progress_dialog = QtWidgets.QProgressDialog('Détection en cours, patientez ...', None, 0, 0, MainWindow)
+        progress_dialog.setWindowModality(QtCore.Qt.WindowModal)
+        progress_dialog.setWindowTitle('Détection')
+        progress_dialog.show()
+
+        self.worker = DetectThread(self.image, self.taux_conf.value(), self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
+        self.worker.finished.connect(self.show_pred)
+        self.worker.finished.connect(progress_dialog.close)
+        self.worker.start()
+
+    def show_pred(self, result):
+        self.pred = result[0]
+        self.image_pred = result[1]
         self.set_image_from_cv(self.image_pred, 2)
         self.analyse_button.setEnabled(True)
 
@@ -511,18 +539,17 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
    
     QtCore.QDir.addSearchPath('Assets', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Assets'))
-    app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("Assets:Logo_small.png"))
-
     file = QtCore.QFile('Assets:Style.qss')
     file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
-
     app.setStyleSheet(str(file.readAll(), 'utf-8'))
     
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+
     sys.exit(app.exec_())
