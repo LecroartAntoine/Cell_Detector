@@ -400,25 +400,29 @@ class Ui_MainWindow(object):
         self.set_image_from_cv(self.image_pred, 3)
 
     def openfile(self):
+        self.files.clear()
         self.folder = str(QtWidgets.QFileDialog.getExistingDirectory(MainWindow, "Sélectionner un dossier"))
         if self.folder:
-            self.files.clear()
             for file in os.listdir(self.folder):
                 if file.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif')):
                     self.files.addItem(file)
     
     def loadimage(self):
-        self.image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-        self.x_min_box.setMaximum(self.image.shape[1])
-        self.x_max_box.setMaximum(self.image.shape[1])
-        self.y_min_box.setMaximum(self.image.shape[0])
-        self.y_max_box.setMaximum(self.image.shape[0])
-        self.set_image_from_cv(self.image)
+        try:
+            self.image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+            self.x_min_box.setMaximum(self.image.shape[1])
+            self.x_max_box.setMaximum(self.image.shape[1])
+            self.y_min_box.setMaximum(self.image.shape[0])
+            self.y_max_box.setMaximum(self.image.shape[0])
+            self.set_image_from_cv(self.image)
 
-        self.prepoc_button.setEnabled(True)
-        self.detection_button.setEnabled(True)
-        self.analyse_button.setEnabled(False)
+            self.prepoc_button.setEnabled(True)
+            self.detection_button.setEnabled(True)
+            self.analyse_button.setEnabled(False)
+
+        except:
+            pass
 
     def set_image_from_cv (self, img, page=0):
         height, width, channel = img.shape
@@ -502,8 +506,8 @@ class Ui_MainWindow(object):
         self.analyse_button.setEnabled(True)
 
     def show_detection(self):
-        self.combined_detection = utils.show_all_detections(self.image, self.pred)
-        self.set_image_from_cv(self.combined_detection, 3)
+        self.combined_image = utils.show_all_detections(self.image, self.pred)
+        self.set_image_from_cv(self.combined_image, 3)
 
 
 if __name__ == "__main__":
