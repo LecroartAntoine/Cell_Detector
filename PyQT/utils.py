@@ -127,6 +127,9 @@ def show_all_detections(image, pred):
     for i in range(0, nb_image, int(nb_image**0.5)):
 
         liste_images_h.append(cv2.hconcat(liste_images[i:i+int(nb_image**0.5)]))
+
+    while np.array_equal(liste_images_h[-1], np.zeros((50, 50 * int(nb_image**0.5), 3), dtype = "uint8")):
+        liste_images_h.pop(-1)
         
     image_combin = cv2.vconcat(liste_images_h)
 

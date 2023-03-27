@@ -418,6 +418,7 @@ class Ui_MainWindow(object):
 
         self.prepoc_button.setEnabled(True)
         self.detection_button.setEnabled(True)
+        self.analyse_button.setEnabled(False)
 
     def set_image_from_cv (self, img, page=0):
         height, width, channel = img.shape
