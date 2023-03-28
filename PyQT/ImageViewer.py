@@ -55,9 +55,4 @@ class PhotoViewer(QtWidgets.QGraphicsView):
             else:
                 factor = 0.8
                 self._zoom -= 1
-            if self._zoom > 0:
-                self.scale(factor, factor)
-            elif self._zoom == 0:
-                self.fitInView()
-            else:
-                self._zoom = 0
+            self.scale(factor, factor)
