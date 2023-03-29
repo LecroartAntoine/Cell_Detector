@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1143</width>
+    <height>705</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <widget class="QWidget" name="page">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderMinimumSectionSize">
+           <number>50</number>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>150</number>
+          </attribute>
+          <attribute name="horizontalHeaderHighlightSections">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>false</bool>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>Nombre Total</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Nombre nues</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Nombre recouvertes</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Nombre de cellules recouvertes</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Concentration nues</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Concentration recouvertes</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>Echantillon 1 : Surnageant</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 2 : Surnageant</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 3 : Surnageant</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Écart type</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 1 : Culot</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 2 : Culot</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 3 : Culot</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Écart type</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tableWidget_2">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderStretchLastSection">
+           <bool>false</bool>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>Nombre capturées</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Nombre non-capturées</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Ratio de capture</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>Echantillon 1</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 2</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Echantillon 3</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Écart Type</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1143</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

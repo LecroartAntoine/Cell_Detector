@@ -1,33 +1,40 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import os, cv2, psutil, ImageViewer, sys
+import os, cv2, psutil, ImageViewer, sys, re
 import numpy as np
 import utils
 
 class DetectThread(QtCore.QThread):
     finished = QtCore.pyqtSignal(object)
 
-    def __init__(self, image, taux_conf, box_width, show_conf, show_name, parent=None):
+    def __init__(self, images, taux_conf, box_width, show_conf, show_name, single = None, parent=None):
         super().__init__(parent)
-        self.image = image
+        self.images = images
         self.taux_conf = taux_conf
         self.box_width = box_width
         self.show_conf = show_conf
         self.show_name = show_name
+        self.single = single
 
     def run(self):
-        pred = utils.yolo_detection(self.image, self.taux_conf / 100)
-        image_pred = utils.plot_bboxes(self.image, pred.boxes.boxes, self.box_width, self.show_conf, self.show_name)
-        self.finished.emit((pred, image_pred))
+        if self.single:
+            self.images[self.single]['pred'] = utils.yolo_detection(self.images[self.single]['image'], self.taux_conf / 100)
+            self.images[self.single]['image_pred'] = utils.plot_bboxes(self.images[self.single]['image'], self.images[self.single]['pred'].boxes.boxes, self.box_width, self.show_conf, self.show_name)
+
+        else:
+            for key in self.images:
+                self.images[key]['pred'] = utils.yolo_detection(self.images[key]['image'], self.taux_conf / 100)
+                self.images[key]['image_pred'] = utils.plot_bboxes(self.images[key]['image'], self.images[key]['pred'].boxes.boxes, self.box_width, self.show_conf, self.show_name)
+        
+        self.finished.emit(self.images)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
 
-        self.image = np.zeros((0,0,0), np.uint8)
+        self.images = {}
 
         # Image Viewer
-        self.preproc_viewer = ImageViewer.PhotoViewer(MainWindow)
         self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
         self.analyse_viewer = ImageViewer.PhotoViewer(MainWindow)
 
@@ -78,11 +85,11 @@ class Ui_MainWindow(object):
         self.open.clicked.connect(self.openfile)
         self.menu.addWidget(self.open)
 
-        self.prepoc_button = QtWidgets.QPushButton(self.centralwidget)
-        self.prepoc_button.setObjectName("prepoc_button")
-        self.prepoc_button.clicked.connect(self.change_page_1)
-        self.prepoc_button.setEnabled(False)
-        self.menu.addWidget(self.prepoc_button)
+        self.select_button = QtWidgets.QPushButton(self.centralwidget)
+        self.select_button.setObjectName("select_button")
+        self.select_button.clicked.connect(self.change_page_1)
+        self.select_button.setEnabled(False)
+        self.menu.addWidget(self.select_button)
 
         self.detection_button = QtWidgets.QPushButton(self.centralwidget)
         self.detection_button.setObjectName("detection_button")
@@ -103,7 +110,7 @@ class Ui_MainWindow(object):
 
         self.files = QtWidgets.QListWidget(self.centralwidget)
         self.files.setObjectName("files")
-        self.files.currentRowChanged.connect(self.loadimage)
+        self.files.currentRowChanged.connect(self.change_image)
         self.menu.addWidget(self.files)
         self.mainLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.menu)
 
@@ -132,164 +139,114 @@ class Ui_MainWindow(object):
         self.welcome_layout.addWidget(self.welcome_message_2)
         self.browser.addWidget(self.welcome)
 
-#####################################  Preprocessing  ########################################################
-        self.preproc = QtWidgets.QWidget()
-        self.preproc.setObjectName("preproc")
-        self.preproc_layout = QtWidgets.QFormLayout(self.preproc)
-        self.preproc_layout.setObjectName("preproc_layout")
-        self.preproc_tool_name_layout = QtWidgets.QHBoxLayout()
-        self.preproc_tool_name_layout.setObjectName("preproc_tool_name_layout")
+##################################### Selection  ########################################################
+        self.select = QtWidgets.QWidget()
+        self.select.setObjectName("select")
+        self.image_select_layout = QtWidgets.QVBoxLayout(self.select)
+        self.image_select_layout.setContentsMargins(0, 0, 0, 0)
+        self.image_select_layout.setObjectName("image_select_layout")
+        self.image_type_layout = QtWidgets.QGridLayout()
+        self.image_type_layout.setObjectName("image_type_layout")
+        self.type_2s = QtWidgets.QComboBox(self.select)
+        self.type_2s.setObjectName("type_2s")
+        self.image_type_layout.addWidget(self.type_2s, 3, 1, 1, 1)
+        self.type_1c = QtWidgets.QComboBox(self.select)
+        self.type_1c.setObjectName("type_1c")
+        self.image_type_layout.addWidget(self.type_1c, 6, 0, 1, 1)
+        self.type_2c = QtWidgets.QComboBox(self.select)
+        self.type_2c.setObjectName("type2c")
+        self.image_type_layout.addWidget(self.type_2c, 6, 1, 1, 1)
+        self.type_1s = QtWidgets.QComboBox(self.select)
+        self.type_1s.setObjectName("type_1s")
+        self.image_type_layout.addWidget(self.type_1s, 3, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem, 4, 0, 1, 1)
+        self.type_2c_label = QtWidgets.QLabel(self.select)
+        self.type_2c_label.setObjectName("type_2c_label")
+        self.image_type_layout.addWidget(self.type_2c_label, 5, 1, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem1, 4, 1, 1, 1)
+        self.type_2s_label = QtWidgets.QLabel(self.select)
+        self.type_2s_label.setObjectName("type_2s_label")
+        self.image_type_layout.addWidget(self.type_2s_label, 2, 1, 1, 1)
+        self.type_3c = QtWidgets.QComboBox(self.select)
+        self.type_3c.setObjectName("type_3c")
+        self.image_type_layout.addWidget(self.type_3c, 6, 2, 1, 1)
+        self.type_1c_label = QtWidgets.QLabel(self.select)
+        self.type_1c_label.setObjectName("type_1c_label")
+        self.image_type_layout.addWidget(self.type_1c_label, 5, 0, 1, 1)
+        self.type_1s_label = QtWidgets.QLabel(self.select)
+        self.type_1s_label.setObjectName("type_1s_label")
+        self.image_type_layout.addWidget(self.type_1s_label, 2, 0, 1, 1)
+        self.type_3s_label = QtWidgets.QLabel(self.select)
+        self.type_3s_label.setObjectName("type_3s_label")
+        self.image_type_layout.addWidget(self.type_3s_label, 2, 2, 1, 1)
+        self.type_3s = QtWidgets.QComboBox(self.select)
+        self.type_3s.setObjectName("type_3s")
+        self.image_type_layout.addWidget(self.type_3s, 3, 2, 1, 1)
+        self.type_3c_label = QtWidgets.QLabel(self.select)
+        self.type_3c_label.setObjectName("type_3c_label")
+        self.image_type_layout.addWidget(self.type_3c_label, 5, 2, 1, 1)
+        self.image_select_label = QtWidgets.QLabel(self.select)
+        self.image_select_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.image_select_label.setObjectName("image_select_label")
+        self.image_type_layout.addWidget(self.image_select_label, 0, 1, 1, 1)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem2, 4, 2, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem3, 1, 1, 1, 1)
+        self.image_type_layout.setRowMinimumHeight(0, 60)
+        self.image_type_layout.setRowMinimumHeight(1, 60)
+        self.image_type_layout.setRowMinimumHeight(2, 60)
+        self.image_type_layout.setRowMinimumHeight(3, 60)
+        self.image_type_layout.setRowMinimumHeight(4, 60)
+        self.image_select_layout.addLayout(self.image_type_layout)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_select_layout.addItem(spacerItem4)
+        self.image_select_confirm_layout = QtWidgets.QHBoxLayout()
+        self.image_select_confirm_layout.setObjectName("image_select_confirm_layout")
+        self.image_select_confirm = QtWidgets.QPushButton(self.select)
+        self.image_select_confirm.setObjectName("image_select_confirm")
+        self.image_select_confirm.clicked.connect(self.set_file_list)
+        self.image_select_confirm_layout.addWidget(self.image_select_confirm)
+        self.image_select_deny = QtWidgets.QPushButton(self.select)
+        self.image_select_deny.setObjectName("image_select_deny")
+        self.image_select_deny.clicked.connect(self.reset_file)
+        self.image_select_confirm_layout.addWidget(self.image_select_deny)
+        self.image_select_layout.addLayout(self.image_select_confirm_layout)
+        self.browser.addWidget(self.select)
 
-#####################################  Auto crop  ########################################################
-        self.auto_label = QtWidgets.QLabel(self.preproc)
-        self.auto_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.auto_label.setObjectName("auto_label")
-        self.preproc_tool_name_layout.addWidget(self.auto_label)
-        self.manual_label = QtWidgets.QLabel(self.preproc)
-        self.manual_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.manual_label.setObjectName("manual_label")
-        self.preproc_tool_name_layout.addWidget(self.manual_label)
-        self.preproc_layout.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.preproc_tool_name_layout)
-        self.preproc_tool = QtWidgets.QHBoxLayout()
-        self.preproc_tool.setObjectName("preproc_tool")
-        self.automatic = QtWidgets.QVBoxLayout()
-        self.automatic.setObjectName("automatic")
-        self.threshold_label = QtWidgets.QLabel(self.preproc)
-        self.threshold_label.setObjectName("threshold_label")
-        self.automatic.addWidget(self.threshold_label)
-        self.threshold_box = QtWidgets.QSpinBox(self.preproc)
-        self.threshold_box.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        self.threshold_box.setAccelerated(True)
-        self.threshold_box.setMinimum(1)
-        self.threshold_box.setMaximum(255)
-        self.threshold_box.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-        self.threshold_box.setProperty("value", 60)
-        self.threshold_box.setObjectName("threshold_box")
-        self.automatic.addWidget(self.threshold_box)
-        self.auto_apply = QtWidgets.QPushButton(self.preproc)
-        self.auto_apply.setObjectName("auto_apply")
-        self.auto_apply.clicked.connect(self.local_cropAuto)
-        self.automatic.addWidget(self.auto_apply)
-        self.preproc_tool.addLayout(self.automatic)
-
-######################## Manual crop #####################################
-        self.manual = QtWidgets.QVBoxLayout()
-        self.manual.setObjectName("manual")
-        self.manual_settings = QtWidgets.QGridLayout()
-        self.manual_settings.setContentsMargins(10, 10, 10, 10)
-        self.manual_settings.setSpacing(10)
-        self.manual_settings.setObjectName("manual_settings")
-
-        # x min
-        self.x_min = QtWidgets.QLabel(self.preproc)
-        self.x_min.setAlignment(QtCore.Qt.AlignCenter)
-        self.x_min.setObjectName("x_min")
-        self.manual_settings.addWidget(self.x_min, 0, 0, 1, 1)
-        self.x_min_box = QtWidgets.QSpinBox(self.preproc)
-        self.x_min_box.setSingleStep(10)
-        self.x_min_box.setMaximum(0)
-        self.x_min_box.setObjectName("x_min_box")
-        self.x_min_box.valueChanged.connect(self.add_x_min_line)
-        self.x_min_box.setAccelerated(True)
-        self.manual_settings.addWidget(self.x_min_box, 0, 1, 1, 1)
-
-        # x max
-        self.x_max = QtWidgets.QLabel(self.preproc)
-        self.x_max.setAlignment(QtCore.Qt.AlignCenter)
-        self.x_max.setObjectName("x_max")
-        self.manual_settings.addWidget(self.x_max, 1, 0, 1, 1)
-        self.x_max_box = QtWidgets.QSpinBox(self.preproc)
-        self.x_max_box.setSingleStep(10)
-        self.x_max_box.setMaximum(0)
-        self.x_max_box.setObjectName("x_max_box")
-        self.x_max_box.valueChanged.connect(self.add_x_max_line)
-        self.x_max_box.setAccelerated(True)
-        self.manual_settings.addWidget(self.x_max_box, 1, 1, 1, 1)
-
-        # y min
-        self.y_min = QtWidgets.QLabel(self.preproc)
-        self.y_min.setAlignment(QtCore.Qt.AlignCenter)
-        self.y_min.setObjectName("y_min")
-        self.manual_settings.addWidget(self.y_min, 0, 2, 1, 1)
-        self.y_min_box = QtWidgets.QSpinBox(self.preproc)
-        self.y_min_box.setSingleStep(10)
-        self.y_min_box.setMaximum(0)
-        self.y_min_box.setObjectName("y_min_box")
-        self.y_min_box.valueChanged.connect(self.add_y_min_line)
-        self.y_min_box.setAccelerated(True)
-        self.manual_settings.addWidget(self.y_min_box, 0, 3, 1, 1)
-
-        # y max
-        self.y_max = QtWidgets.QLabel(self.preproc)
-        self.y_max.setAlignment(QtCore.Qt.AlignCenter)
-        self.y_max.setObjectName("y_max")
-        self.manual_settings.addWidget(self.y_max, 1, 2, 1, 1)
-        self.y_max_box = QtWidgets.QSpinBox(self.preproc)
-        self.y_max_box.setSingleStep(10)
-        self.y_max_box.setMaximum(0)
-        self.y_max_box.setObjectName("y_max_box")
-        self.y_max_box.valueChanged.connect(self.add_y_max_line)
-        self.y_max_box.setAccelerated(True)
-        self.manual_settings.addWidget(self.y_max_box, 1, 3, 1, 1)
-
-
-        self.manual.addLayout(self.manual_settings)
-        self.manual_apply = QtWidgets.QPushButton(self.preproc)
-        self.manual_apply.setObjectName("manual_apply")
-        self.manual_apply.clicked.connect(self.manual_crop)
-        self.manual.addWidget(self.manual_apply)
-        self.preproc_tool.addLayout(self.manual)
-
-        self.preproc_layout.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.preproc_tool)
-        self.preproc_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.preproc_viewer)
-        self.browser.addWidget(self.preproc)
-
-#####################################  Yolo detect  ########################################################
+#####################################  Yolo detection  ########################################################
         self.detect = QtWidgets.QWidget()
-        self.detect.setObjectName("detect_2")
+        self.detect.setObjectName("detect")
         self.detect_layout = QtWidgets.QVBoxLayout(self.detect)
         self.detect_layout.setObjectName("detect_layout")
-        self.detect_tool = QtWidgets.QHBoxLayout()
-        self.detect_tool.setObjectName("detect_tool")
-        self.detect_tool.setSpacing(20)
+        self.detect_tool_layout = QtWidgets.QHBoxLayout()
+        self.detect_tool_layout.setObjectName("detect_tool_layout")
+        self.detect_tool_layout.setSpacing(20)
         self.detect_model = QtWidgets.QHBoxLayout()
         self.detect_model.setObjectName("detect_model")
 
-        # self.choose_model_label = QtWidgets.QLabel(self.detect)
-        # self.choose_model_label.setObjectName("choose_model_label")
-        # self.detect_model.addWidget(self.choose_model_label)
-
-        # self.choose_model = QtWidgets.QComboBox(self.detect)
-        # self.choose_model.setEditable(False)
-        # self.choose_model.setCurrentText("1.0")
-        # self.choose_model.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
-        # self.choose_model.setPlaceholderText("")
-        # self.choose_model.setFrame(True)
-        # self.choose_model.setObjectName("choose_model")
-        # self.choose_model.addItem("")
-        # self.choose_model.setCurrentIndex(0)
-        # self.detect_model.addWidget(self.choose_model)
-        # self.detect_tool.addLayout(self.detect_model)
-
-        self.show_conf_layout = QtWidgets.QHBoxLayout()
-        self.show_conf_layout.setObjectName("show_conf_layout")
+        self.show_layout = QtWidgets.QGridLayout()
+        self.show_layout.setObjectName("show_layout")
+        
         self.show_conf_label = QtWidgets.QLabel(self.detect)
         self.show_conf_label.setObjectName("show_conf_label")
-        self.show_conf_layout.addWidget(self.show_conf_label)
+        self.show_layout.addWidget(self.show_conf_label, 0, 0)
+
         self.show_conf = QtWidgets.QRadioButton(self.detect)
         self.show_conf.setObjectName("show_conf")
-        self.show_conf_layout.addWidget(self.show_conf)
-        self.detect_tool.addLayout(self.show_conf_layout)
-
-        self.show_name_layout = QtWidgets.QHBoxLayout()
-        self.show_name_layout.setObjectName("show_name_layout")
+        self.show_layout.addWidget(self.show_conf, 0, 1)
+        
         self.show_name_label = QtWidgets.QLabel(self.detect)
         self.show_name_label.setObjectName("show_name_label")
-        self.show_name_layout.addWidget(self.show_name_label)
+        self.show_layout.addWidget(self.show_name_label, 1, 0)
+
         self.show_name = QtWidgets.QRadioButton(self.detect)
         self.show_name.setObjectName("show_name")
-        self.show_name_layout.addWidget(self.show_name)
-        self.detect_tool.addLayout(self.show_name_layout)
+        self.show_layout.addWidget(self.show_name, 1, 1)
+
+        self.detect_tool_layout.addLayout(self.show_layout)
 
         self.group = QtWidgets.QButtonGroup()
         self.group.addButton(self.show_conf)
@@ -297,6 +254,17 @@ class Ui_MainWindow(object):
         self.group.setExclusive(False)
         self.show_name.setChecked(True)
         self.show_conf.setChecked(True)
+
+        self.detect_box = QtWidgets.QHBoxLayout()
+        self.detect_box.setObjectName("detect_box")
+        self.box_width_label = QtWidgets.QLabel(self.detect)
+        self.box_width_label.setObjectName("box_width_label")
+        self.detect_box.addWidget(self.box_width_label)
+        self.box_width = QtWidgets.QSpinBox(self.detect)
+        self.box_width.setProperty("value", 1)
+        self.box_width.setObjectName("box_width")
+        self.detect_box.addWidget(self.box_width)
+        self.detect_tool_layout.addLayout(self.detect_box)
 
         self.taux_conf_layout  = QtWidgets.QHBoxLayout()
         self.taux_conf_layout.setObjectName("taux_conf_layout")
@@ -309,25 +277,23 @@ class Ui_MainWindow(object):
         self.taux_conf.setProperty("value", 95)
         self.taux_conf.setObjectName("taux_conf")
         self.taux_conf_layout.addWidget(self.taux_conf)
-        self.detect_tool.addLayout(self.taux_conf_layout)
-        self.detect_box = QtWidgets.QHBoxLayout()
-        self.detect_box.setObjectName("detect_box")
-        self.box_width_label = QtWidgets.QLabel(self.detect)
-        self.box_width_label.setObjectName("box_width_label")
-        self.detect_box.addWidget(self.box_width_label)
-        self.box_width = QtWidgets.QSpinBox(self.detect)
-        self.box_width.setProperty("value", 1)
-        self.box_width.setObjectName("box_width")
+        self.detect_tool_layout.addLayout(self.taux_conf_layout)
 
-        self.detect_box.addWidget(self.box_width)
-        self.detect_tool.addLayout(self.detect_box)
-        self.start_detect = QtWidgets.QPushButton(self.detect)
-        self.start_detect.setObjectName("start_detect")
-        self.start_detect.clicked.connect(self.get_pred)
-        self.detect_tool.addWidget(self.start_detect)
+        self.detect_button_layout = QtWidgets.QVBoxLayout()
+        self.detect_button_layout.setObjectName("detect_button_layout")
+        self.start_detect_one = QtWidgets.QPushButton(self.detect)
+        self.start_detect_one.setObjectName("start_detect_one")
+        self.start_detect_one.clicked.connect(lambda : self.get_pred(True))
+        self.detect_button_layout.addWidget(self.start_detect_one)
+
+        self.start_detect_many = QtWidgets.QPushButton(self.detect)
+        self.start_detect_many.setObjectName("start_detect_many")
+        self.start_detect_many.clicked.connect(self.get_pred)
+        self.detect_button_layout.addWidget(self.start_detect_many)
+        self.detect_tool_layout.addLayout(self.detect_button_layout)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.detect_tool.addItem(spacerItem)
-        self.detect_layout.addLayout(self.detect_tool)
+        self.detect_tool_layout.addItem(spacerItem)
+        self.detect_layout.addLayout(self.detect_tool_layout)
         self.detect_layout.addWidget(self.detect_viewer)
         self.browser.addWidget(self.detect)
 
@@ -353,22 +319,14 @@ class Ui_MainWindow(object):
         self.analyse_tool.addWidget(self.mallassez_button)
 
         self.mallassez_clean_result = QtWidgets.QLineEdit(self.analyse)
-        self.mallassez_clean_result.setInputMask("")
-        self.mallassez_clean_result.setText("")
-        self.mallassez_clean_result.setMaxLength(20)
         self.mallassez_clean_result.setAlignment(QtCore.Qt.AlignCenter)
         self.mallassez_clean_result.setReadOnly(True)
-        self.mallassez_clean_result.setPlaceholderText("")
         self.mallassez_clean_result.setObjectName("mallassez_clean_result")
         self.analyse_tool.addWidget(self.mallassez_clean_result)
 
         self.mallassez_dirty_result = QtWidgets.QLineEdit(self.analyse)
-        self.mallassez_dirty_result.setInputMask("")
-        self.mallassez_dirty_result.setText("")
-        self.mallassez_dirty_result.setMaxLength(20)
         self.mallassez_dirty_result.setAlignment(QtCore.Qt.AlignCenter)
         self.mallassez_dirty_result.setReadOnly(True)
-        self.mallassez_dirty_result.setPlaceholderText("")
         self.mallassez_dirty_result.setObjectName("mallassez_dirty_result")
         self.analyse_tool.addWidget(self.mallassez_dirty_result)
 
@@ -403,83 +361,133 @@ class Ui_MainWindow(object):
         self.cpu_label.setText(_translate("MainWindow", "CPU"))
         self.ram_label.setText(_translate("MainWindow", "RAM"))
         self.open.setText(_translate("MainWindow", "Ouvrir"))
-        self.prepoc_button.setText(_translate("MainWindow", "Prétraitement"))
+        self.select_button.setText(_translate("MainWindow", "Sélection"))
         self.detection_button.setText(_translate("MainWindow", "Détection"))
         self.analyse_button.setText(_translate("MainWindow", "Analyse"))
         self.reset.setText(_translate("MainWindow", ""))
         self.welcome_message_1.setText(_translate("MainWindow", "Bienvenue"))
         self.welcome_message_2.setText(_translate("MainWindow", "Veuillez ouvrir un dossier contenant vos images"))
-        self.auto_label.setText(_translate("MainWindow", "Automatic"))
-        self.manual_label.setText(_translate("MainWindow", "Manuel"))
-        self.threshold_label.setText(_translate("MainWindow", "Valeur threshold (0 - 255)"))
-        self.auto_apply.setText(_translate("MainWindow", "Appliquer"))
-        self.y_min.setText(_translate("MainWindow", "Y Min"))
-        self.x_min.setText(_translate("MainWindow", "X Min"))
-        self.x_max.setText(_translate("MainWindow", "X Max"))
-        self.y_max.setText(_translate("MainWindow", "Y Max"))
-        self.manual_apply.setText(_translate("MainWindow", "Appliquer"))
-        # self.choose_model_label.setText(_translate("MainWindow", "Choix du modèle"))
-        # self.choose_model.setItemText(0, _translate("MainWindow", "1.0"))
+        self.image_select_label.setText(_translate("MainWindow", "Confirmer les images à traiter"))
+        self.type_1s_label.setText(_translate("MainWindow", "Echantillon 1 : Surnageant"))
+        self.type_2s_label.setText(_translate("MainWindow", "Echantillon 2 : Surnageant"))
+        self.type_2c_label.setText(_translate("MainWindow", "Echantillon 2 : Culot"))
+        self.type_3s_label.setText(_translate("MainWindow", "Echantillon 3 : Surnageant"))
+        self.type_1c_label.setText(_translate("MainWindow", "Echantillon 1 : Culot"))
+        self.type_3c_label.setText(_translate("MainWindow", "Echantillon 3 : Culot"))
+        self.image_select_confirm.setText(_translate("MainWindow", "Valider"))
+        self.image_select_deny.setText(_translate("MainWindow", "Annuler"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
         self.show_name_label.setText(_translate("MainWindow", "Montrer le nom du label"))
         self.taux_conf_label.setText(_translate("MainWindow", "Intervalle de confiance"))
         self.taux_conf.setSuffix(_translate("MainWindow", "%"))
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
-        self.start_detect.setText(_translate("MainWindow", "Lancer la détection"))
+        self.start_detect_one.setText(_translate("MainWindow", "Lancer la détection sur cette image"))
+        self.start_detect_many.setText(_translate("MainWindow", "Lancer la détection sur toutes les images"))
         self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détectées"))
         self.mallassez_button.setText(_translate("MainWindow", "Calcul de Mallassez"))
 
     
     def change_page_1(self):
         self.browser.setCurrentIndex(1)
-        self.set_image_from_cv(self.image, 1)
 
     def change_page_2(self):
         self.browser.setCurrentIndex(2)
-        self.set_image_from_cv(self.image, 2)
+        self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'], 2)
 
     def change_page_3(self):
         self.browser.setCurrentIndex(3)
-        self.set_image_from_cv(self.image_pred, 3)
+        self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 3)
 
     def openfile(self):
         self.files.clear()
+        self.type_1s.clear()
+        self.type_2s.clear()
+        self.type_3s.clear()
+        self.type_1c.clear()
+        self.type_2c.clear()
+        self.type_3c.clear()
+
         self.folder = str(QtWidgets.QFileDialog.getExistingDirectory(MainWindow, "Sélectionner un dossier"))
         if self.folder:
             for file in os.listdir(self.folder):
                 if file.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.tif')):
-                    self.files.addItem(file)
+
+                    name = re.findall('^.*(?=\.[^.]*$)', file.lower())[0]
+
+                    if name[-2:] == '1s':
+                        self.type_1s.addItem(file)
+                    if name[-2:] == '1c':
+                        self.type_1c.addItem(file)
+                    if name[-2:] == '2s':
+                        self.type_2s.addItem(file)
+                    if name[-2:] == '2c':
+                        self.type_2c.addItem(file)
+                    if name[-2:] == '3s':
+                        self.type_3s.addItem(file)
+                    if name[-2:] == '3c':
+                        self.type_3c.addItem(file)
+                        
+        self.select_button.setEnabled(True)            
+        self.change_page_1()
+
+    def set_file_list(self):
+        self.files.clear()
+        self.files.addItem(self.type_1s.currentText())
+        self.files.addItem(self.type_1c.currentText())
+        self.files.addItem(self.type_2s.currentText())
+        self.files.addItem(self.type_2c.currentText())
+        self.files.addItem(self.type_3s.currentText())
+        self.files.addItem(self.type_3c.currentText())
+
+        self.loadimages()
+        self.browser.setCurrentIndex(2)
+        self.files.setCurrentRow(0)
+        # self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'])
+        
+
+    def reset_file(self):
+        self.files.clear()
+        self.type_1s.clear()
+        self.type_2s.clear()
+        self.type_3s.clear()
+        self.type_1c.clear()
+        self.type_2c.clear()
+        self.type_3c.clear()
+
     
-    def loadimage(self):
+    def loadimages(self):
+        
+        for item in [item.text() for item in [self.files.item(i) for i in range(self.files.count())]]:
+            image = cv2.imdecode(np.fromfile(self.folder + '/' + item, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            self.images[item] = {'image' : image}
+
+        self.detection_button.setEnabled(True)
+        self.analyse_button.setEnabled(False)
+     
+    def change_image(self):
         try:
-            self.image = cv2.imdecode(np.fromfile(self.folder + '/' + self.files.currentItem().text(), dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-            self.x_min_box.setMaximum(self.image.shape[1])
-            self.x_max_box.setMaximum(self.image.shape[1])
-            self.y_min_box.setMaximum(self.image.shape[0])
-            self.y_max_box.setMaximum(self.image.shape[0])
-            self.set_image_from_cv(self.image)
-
-            self.prepoc_button.setEnabled(True)
-            self.detection_button.setEnabled(True)
-            self.analyse_button.setEnabled(False)
-
+            self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'])
+            self.analyse_button.setEnabled(True)
         except:
-            pass
+            try:
+                self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'])
+                self.browser.setCurrentIndex(2)
+                self.analyse_button.setEnabled(False)
+            except:
+                pass
+    
 
     def set_image_from_cv (self, img, page=0):
         height, width, channel = img.shape
         bytesPerLine = channel * width
         qImg = QtGui.QImage(img.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
 
-        if page == 1:
-            self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
-        elif page == 2:
+        if page == 2:
             self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
         elif page == 3:
             self.analyse_viewer.setPhoto(QtGui.QPixmap(qImg))
         else:
-            self.preproc_viewer.setPhoto(QtGui.QPixmap(qImg))
             self.detect_viewer.setPhoto(QtGui.QPixmap(qImg))
             self.analyse_viewer.setPhoto(QtGui.QPixmap(qImg))
 
@@ -487,88 +495,36 @@ class Ui_MainWindow(object):
         self.cpu_bar.setValue(int(psutil.cpu_percent()))
         self.ram_bar.setValue(int(psutil.virtual_memory().percent))
     
-    def local_cropAuto(self):
-        try:
-            self.loadimage()
-            self.image = utils.cropAuto(self.image, self.threshold_box.value())
-            self.set_image_from_cv(self.image, 1)
-        except:
-            pass
 
-    def add_x_max_line(self):
-
-        try:
-            if len(self.preproc_viewer.scene().items()) > 1:
-                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
-            self.preproc_viewer.scene().addLine(self.x_max_box.value(), 0, self.x_max_box.value(), self.image.shape[0], pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
-        except:
-            pass
-
-    def add_x_min_line(self):
-        try:
-            if len(self.preproc_viewer.scene().items()) > 1:
-                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
-            self.preproc_viewer.scene().addLine(self.x_min_box.value(), 0, self.x_min_box.value(), self.image.shape[0], pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
-        except:
-            pass
-
-    def add_y_max_line(self):
-        try:
-            if len(self.preproc_viewer.scene().items()) > 1:
-                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
-            self.preproc_viewer.scene().addLine(0, self.y_max_box.value(), self.image.shape[1], self.y_max_box.value(), pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
-        except:
-            pass
-
-    def add_y_min_line(self):
-        try:
-            if len(self.preproc_viewer.scene().items()) > 1:
-                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
-            self.preproc_viewer.scene().addLine(0, self.y_min_box.value(), self.image.shape[1], self.y_min_box.value(), pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 0, 0) ), 5))
-        except:
-            pass
-    
-    def manual_crop(self):
-        try:
-            if len(self.preproc_viewer.scene().items()) > 1:
-                self.preproc_viewer.scene().removeItem(self.preproc_viewer.scene().items()[0])
-            self.loadimage()
-            self.image = self.image[self.y_min_box.value() : self.y_max_box.value(), self.x_min_box.value() : self.x_max_box.value()].copy()
-            x = self.image.shape[0] if self.image.shape[0] > self.image.shape[1] else self.image.shape[1]
-            while x % 32 != 0:
-                x -= 1
-            self.image = cv2.resize(self.image, (x, x), interpolation = cv2.INTER_AREA)
-            self.set_image_from_cv(self.image, 1)
-        except:
-            pass
-
-    def get_pred(self):
-        
+    def get_pred(self, single = False):
         progress_dialog = QtWidgets.QProgressDialog('Détection en cours, patientez ...', None, 0, 0, MainWindow)
         progress_dialog.setWindowModality(QtCore.Qt.WindowModal)
         progress_dialog.setWindowTitle('Détection')
         progress_dialog.show()
 
-        self.worker = DetectThread(self.image, self.taux_conf.value(), self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
-        self.worker.finished.connect(self.show_pred)
+        if single:
+            self.worker = DetectThread(self.images, self.taux_conf.value(), self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked(), self.files.currentItem().text())
+        else:
+            self.worker = DetectThread(self.images, self.taux_conf.value(), self.box_width.value(), self.show_conf.isChecked(), self.show_name.isChecked())
+
+        self.worker.finished.connect(self.handle_pred)
         self.worker.finished.connect(progress_dialog.close)
         self.worker.start()
 
-    def show_pred(self, result):
-        self.pred = result[0]
-        self.image_pred = result[1]
-        self.set_image_from_cv(self.image_pred, 2)
+    def handle_pred(self, result):
+        self.images = result
+        self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 2)
         self.analyse_button.setEnabled(True)
 
     def show_detection(self):
-        self.combined_image = utils.show_all_detections(self.image, self.pred)
-        self.set_image_from_cv(self.combined_image, 3)
+        combined_image = utils.show_all_detections(self.images[self.files.currentItem().text()])
+        self.set_image_from_cv(combined_image, 3)
 
     def mallassez_calc(self):
-        self.con_clean, self.con_dirty = utils.calcul_malassez(self.image, self.pred)
+        self.con_clean, self.con_dirty = utils.calcul_malassez(self.images[self.files.currentItem().text()])
 
-        self.mallassez_clean_result.setText(str(self.con_clean) + "x10^9")
-        self.mallassez_dirty_result.setText(str(self.con_dirty) + "x10^9")
+        self.mallassez_clean_result.setText(str(round(self.con_clean,2)) + "x10\u2075")
+        self.mallassez_dirty_result.setText(str(round(self.con_dirty,2)) + "x10\u2075")
 
 
 if __name__ == "__main__":

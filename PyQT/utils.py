@@ -106,17 +106,17 @@ def box_label(image, box, label, color, thickness, txt_color=(255, 255, 255)):
     
     return image
 
-def show_all_detections(image, pred):
+def show_all_detections(image):
 
     liste_images = []
     liste_images_h = []
-    nb_image = len(pred.boxes.boxes)
+    nb_image = len(image['pred'].boxes.boxes)
     fill = np.zeros((50, 50, 3), dtype = "uint8")
 
 
-    for box in pred.boxes.boxes:
+    for box in image['pred'].boxes.boxes:
 
-        cell = image[int(box[1]):int(box[3]), int(box[0]):int(box[2])]
+        cell = image['image'][int(box[1]):int(box[3]), int(box[0]):int(box[2])]
         cell = cv2.resize(cell, (50, 50), interpolation=cv2.INTER_AREA)
         liste_images.append(cell)
 
@@ -137,21 +137,21 @@ def show_all_detections(image, pred):
 
 HEIGHT_SQUARE = 186
 WIDTH_SQUARE = 230
-# DILUTION = 1000
 
-def calcul_malassez(image, pred):
+def calcul_malassez(image):
     liste_nb_cells_clean = []
     liste_nb_cells_dirty = []
-    liste_detection = [box.tolist() for box in pred.boxes.boxes]
+    liste_detection = [box.tolist() for box in image['pred'].boxes.boxes]
 
-    for y in range(image.shape[0]//HEIGHT_SQUARE):
-        for x in range(image.shape[1]//WIDTH_SQUARE):
+    for y in range(image['image'].shape[0]//HEIGHT_SQUARE):
+        for x in range(image['image'].shape[1]//WIDTH_SQUARE):
             x_min = x * WIDTH_SQUARE
             x_max = x * WIDTH_SQUARE + WIDTH_SQUARE
             y_min = y * HEIGHT_SQUARE
             y_max = y * HEIGHT_SQUARE + HEIGHT_SQUARE
             nb_cells_clean = 0
             nb_cells_dirty = 0
+
 
             for box in liste_detection[:]:
                 if box[-1] == 0:
@@ -169,12 +169,12 @@ def calcul_malassez(image, pred):
             liste_nb_cells_clean.append(nb_cells_clean)
             liste_nb_cells_dirty.append(nb_cells_dirty)
 
-    concentration_clean = (sum(liste_nb_cells_clean) / (len(liste_nb_cells_clean)*0.00001)) 
-    concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)*0.00001))
+    concentration_clean = (sum(liste_nb_cells_clean) / (len(liste_nb_cells_clean)))
+    concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)))
 
     return (concentration_clean, concentration_dirty)
 
-def calcul_recouvrement(image, pred):
+def calcul_recouvrement(image):
     liste_dirty_cell_avg_black = []
     liste_detection = pred.boxes.boxes
     image_bw = image
