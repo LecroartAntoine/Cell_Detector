@@ -135,20 +135,21 @@ def show_all_detections(image, pred):
 
     return image_combin
 
-HEIGHT_SQUARE = 280
-WIDTH_SQUARE = 320
-DILUTION = 1000
+HEIGHT_SQUARE = 186
+WIDTH_SQUARE = 230
+# DILUTION = 1000
 
 def calcul_malassez(image, pred):
     liste_nb_cells_clean = []
     liste_nb_cells_dirty = []
-    liste_detection = pred.boxes.boxes
-    for y in range(image.shape[1]//HEIGHT_SQUARE):
-        for x in range(image.shape[0]//WIDTH_SQUARE):
+    liste_detection = [box.tolist() for box in pred.boxes.boxes]
+
+    for y in range(image.shape[0]//HEIGHT_SQUARE):
+        for x in range(image.shape[1]//WIDTH_SQUARE):
             x_min = x * WIDTH_SQUARE
-            x_max = x * (WIDTH_SQUARE * 2)
+            x_max = x * WIDTH_SQUARE + WIDTH_SQUARE
             y_min = y * HEIGHT_SQUARE
-            y_max = y * (HEIGHT_SQUARE * 2)
+            y_max = y * HEIGHT_SQUARE + HEIGHT_SQUARE
             nb_cells_clean = 0
             nb_cells_dirty = 0
 
@@ -164,11 +165,12 @@ def calcul_malassez(image, pred):
                         nb_cells_dirty += 1
                         liste_detection.remove(box)
 
+
             liste_nb_cells_clean.append(nb_cells_clean)
             liste_nb_cells_dirty.append(nb_cells_dirty)
 
-    concentration_clean = (sum(liste_nb_cells_clean) / (len(liste_nb_cells_clean)*0.00001)) * DILUTION
-    concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)*0.00001)) * DILUTION
+    concentration_clean = (sum(liste_nb_cells_clean) / (len(liste_nb_cells_clean)*0.00001)) 
+    concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)*0.00001))
 
     return (concentration_clean, concentration_dirty)
 

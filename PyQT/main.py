@@ -254,20 +254,22 @@ class Ui_MainWindow(object):
         self.detect_tool.setSpacing(20)
         self.detect_model = QtWidgets.QHBoxLayout()
         self.detect_model.setObjectName("detect_model")
-        self.choose_model_label = QtWidgets.QLabel(self.detect)
-        self.choose_model_label.setObjectName("choose_model_label")
-        self.detect_model.addWidget(self.choose_model_label)
-        self.choose_model = QtWidgets.QComboBox(self.detect)
-        self.choose_model.setEditable(False)
-        self.choose_model.setCurrentText("1.0")
-        self.choose_model.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
-        self.choose_model.setPlaceholderText("")
-        self.choose_model.setFrame(True)
-        self.choose_model.setObjectName("choose_model")
-        self.choose_model.addItem("")
-        self.choose_model.setCurrentIndex(0)
-        self.detect_model.addWidget(self.choose_model)
-        self.detect_tool.addLayout(self.detect_model)
+
+        # self.choose_model_label = QtWidgets.QLabel(self.detect)
+        # self.choose_model_label.setObjectName("choose_model_label")
+        # self.detect_model.addWidget(self.choose_model_label)
+
+        # self.choose_model = QtWidgets.QComboBox(self.detect)
+        # self.choose_model.setEditable(False)
+        # self.choose_model.setCurrentText("1.0")
+        # self.choose_model.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
+        # self.choose_model.setPlaceholderText("")
+        # self.choose_model.setFrame(True)
+        # self.choose_model.setObjectName("choose_model")
+        # self.choose_model.addItem("")
+        # self.choose_model.setCurrentIndex(0)
+        # self.detect_model.addWidget(self.choose_model)
+        # self.detect_tool.addLayout(self.detect_model)
 
         self.show_conf_layout = QtWidgets.QHBoxLayout()
         self.show_conf_layout.setObjectName("show_conf_layout")
@@ -344,7 +346,31 @@ class Ui_MainWindow(object):
         self.show_detection_button.setObjectName("show_detection_button")
         self.show_detection_button.clicked.connect(self.show_detection)
         self.analyse_tool.addWidget(self.show_detection_button)
-        
+
+        self.mallassez_button = QtWidgets.QPushButton(self.analyse)
+        self.mallassez_button.setObjectName("mallassez_button")
+        self.mallassez_button.clicked.connect(self.mallassez_calc)
+        self.analyse_tool.addWidget(self.mallassez_button)
+
+        self.mallassez_clean_result = QtWidgets.QLineEdit(self.analyse)
+        self.mallassez_clean_result.setInputMask("")
+        self.mallassez_clean_result.setText("")
+        self.mallassez_clean_result.setMaxLength(20)
+        self.mallassez_clean_result.setAlignment(QtCore.Qt.AlignCenter)
+        self.mallassez_clean_result.setReadOnly(True)
+        self.mallassez_clean_result.setPlaceholderText("")
+        self.mallassez_clean_result.setObjectName("mallassez_clean_result")
+        self.analyse_tool.addWidget(self.mallassez_clean_result)
+
+        self.mallassez_dirty_result = QtWidgets.QLineEdit(self.analyse)
+        self.mallassez_dirty_result.setInputMask("")
+        self.mallassez_dirty_result.setText("")
+        self.mallassez_dirty_result.setMaxLength(20)
+        self.mallassez_dirty_result.setAlignment(QtCore.Qt.AlignCenter)
+        self.mallassez_dirty_result.setReadOnly(True)
+        self.mallassez_dirty_result.setPlaceholderText("")
+        self.mallassez_dirty_result.setObjectName("mallassez_dirty_result")
+        self.analyse_tool.addWidget(self.mallassez_dirty_result)
 
         self.analyse_layout.addLayout(self.analyse_tool)
         self.analyse_layout.addWidget(self.analyse_viewer)
@@ -392,8 +418,8 @@ class Ui_MainWindow(object):
         self.x_max.setText(_translate("MainWindow", "X Max"))
         self.y_max.setText(_translate("MainWindow", "Y Max"))
         self.manual_apply.setText(_translate("MainWindow", "Appliquer"))
-        self.choose_model_label.setText(_translate("MainWindow", "Choix du modèle"))
-        self.choose_model.setItemText(0, _translate("MainWindow", "1.0"))
+        # self.choose_model_label.setText(_translate("MainWindow", "Choix du modèle"))
+        # self.choose_model.setItemText(0, _translate("MainWindow", "1.0"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
         self.show_name_label.setText(_translate("MainWindow", "Montrer le nom du label"))
         self.taux_conf_label.setText(_translate("MainWindow", "Intervalle de confiance"))
@@ -401,6 +427,7 @@ class Ui_MainWindow(object):
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
         self.start_detect.setText(_translate("MainWindow", "Lancer la détection"))
         self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détectées"))
+        self.mallassez_button.setText(_translate("MainWindow", "Calcul de Mallassez"))
 
     
     def change_page_1(self):
@@ -536,6 +563,12 @@ class Ui_MainWindow(object):
     def show_detection(self):
         self.combined_image = utils.show_all_detections(self.image, self.pred)
         self.set_image_from_cv(self.combined_image, 3)
+
+    def mallassez_calc(self):
+        self.con_clean, self.con_dirty = utils.calcul_malassez(self.image, self.pred)
+
+        self.mallassez_clean_result.setText(str(self.con_clean) + "x10^9")
+        self.mallassez_dirty_result.setText(str(self.con_dirty) + "x10^9")
 
 
 if __name__ == "__main__":
