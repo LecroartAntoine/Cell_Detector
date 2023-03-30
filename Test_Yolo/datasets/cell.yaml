@@ -1,3 +1,0 @@
-{names: [cell], nc: 1, test: 'C:\Users\antoi\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\test',
-  train: 'C:\Users\antoi\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\train',
-  val: 'C:\Users\antoi\Documents\GitHub\Cell_Detector\Test_Yolo\datasets\images\val'}
