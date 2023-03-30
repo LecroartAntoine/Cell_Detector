@@ -113,7 +113,6 @@ def show_all_detections(image):
     nb_image = len(image['pred'].boxes.boxes)
     fill = np.zeros((50, 50, 3), dtype = "uint8")
 
-
     for box in image['pred'].boxes.boxes:
 
         cell = image['image'][int(box[1]):int(box[3]), int(box[0]):int(box[2])]

@@ -45,14 +45,64 @@ class Ui_MainWindow(object):
         self.mainLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
         self.mainLayout.setObjectName("mainLayout")
 
-#####################################  Infos  ########################################################
-        self.infos = QtWidgets.QHBoxLayout()
-        self.infos.setSpacing(20)
-        self.infos.setObjectName("infos")
+# #####################################  Infos  ########################################################
+#         self.infos = QtWidgets.QHBoxLayout()
+#         self.infos.setSpacing(20)
+#         self.infos.setObjectName("infos")
+       
+        
+#         self.mainLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
+
+#################################  MENU  ##################################################
+        self.menu = QtWidgets.QVBoxLayout()
+        self.menu.setObjectName("menu")
+
         self.logo = QtWidgets.QLabel(self.centralwidget)
         self.logo.setObjectName('Logo')
         self.logo.setPixmap(QtGui.QPixmap("Assets:Logo.png"))
-        self.infos.addWidget(self.logo)
+        self.menu.addWidget(self.logo)
+
+
+        self.menu_button = QtWidgets.QVBoxLayout()
+        self.menu_button.setContentsMargins(15, -1, 15, -1)
+        self.menu_button.setObjectName("menu_button")
+
+        self.open = QtWidgets.QPushButton(self.centralwidget)
+        self.open.setObjectName("open")
+        self.open.clicked.connect(self.openfile)
+        self.menu_button.addWidget(self.open)
+
+        self.select_button = QtWidgets.QPushButton(self.centralwidget)
+        self.select_button.setObjectName("select_button")
+        self.select_button.clicked.connect(self.change_page_1)
+        self.select_button.setEnabled(False)
+        self.menu_button.addWidget(self.select_button)
+
+        self.detection_button = QtWidgets.QPushButton(self.centralwidget)
+        self.detection_button.setObjectName("detection_button")
+        self.detection_button.clicked.connect(self.change_page_2)
+        self.detection_button.setEnabled(False)
+        self.menu_button.addWidget(self.detection_button)
+
+        self.analyse_button = QtWidgets.QPushButton(self.centralwidget)
+        self.analyse_button.setObjectName("analyse_button")
+        self.analyse_button.clicked.connect(self.change_page_3)
+        self.analyse_button.setEnabled(False)
+        self.menu_button.addWidget(self.analyse_button)
+
+        self.calculs_button = QtWidgets.QPushButton(self.centralwidget)
+        self.calculs_button.setObjectName("calculs_button")
+        self.calculs_button.clicked.connect(self.change_page_4)
+        self.calculs_button.setEnabled(False)
+        self.menu_button.addWidget(self.calculs_button)
+
+        self.files = QtWidgets.QListWidget(self.centralwidget)
+        self.files.setObjectName("files")
+        self.files.currentRowChanged.connect(self.change_image)
+        self.menu_button.addWidget(self.files)
+
+        self.menu.addLayout(self.menu_button)
+
         self.cpu = QtWidgets.QHBoxLayout()
         self.cpu.setObjectName("cpu")
         self.cpu_label = QtWidgets.QLabel(self.centralwidget)
@@ -62,7 +112,7 @@ class Ui_MainWindow(object):
         self.cpu_bar.setProperty("value", 1)
         self.cpu_bar.setObjectName("cpu_bar")
         self.cpu.addWidget(self.cpu_bar)
-        self.infos.addLayout(self.cpu)
+        self.menu_button.addLayout(self.cpu)
         self.ram = QtWidgets.QHBoxLayout()
         self.ram.setObjectName("ram")
         self.ram_label = QtWidgets.QLabel(self.centralwidget)
@@ -72,46 +122,8 @@ class Ui_MainWindow(object):
         self.ram_bar.setProperty("value", 1)
         self.ram_bar.setObjectName("ram_bar")
         self.ram.addWidget(self.ram_bar)
-        self.infos.addLayout(self.ram)
-        self.mainLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
+        self.menu_button.addLayout(self.ram)
 
-#################################  MENU  ##################################################
-        self.menu = QtWidgets.QVBoxLayout()
-        self.menu.setContentsMargins(15, -1, 15, -1)
-        self.menu.setObjectName("menu")
-
-        self.open = QtWidgets.QPushButton(self.centralwidget)
-        self.open.setObjectName("open")
-        self.open.clicked.connect(self.openfile)
-        self.menu.addWidget(self.open)
-
-        self.select_button = QtWidgets.QPushButton(self.centralwidget)
-        self.select_button.setObjectName("select_button")
-        self.select_button.clicked.connect(self.change_page_1)
-        self.select_button.setEnabled(False)
-        self.menu.addWidget(self.select_button)
-
-        self.detection_button = QtWidgets.QPushButton(self.centralwidget)
-        self.detection_button.setObjectName("detection_button")
-        self.detection_button.clicked.connect(self.change_page_2)
-        self.detection_button.setEnabled(False)
-        self.menu.addWidget(self.detection_button)
-
-        self.analyse_button = QtWidgets.QPushButton(self.centralwidget)
-        self.analyse_button.setObjectName("analyse_button")
-        self.analyse_button.clicked.connect(self.change_page_3)
-        self.analyse_button.setEnabled(False)
-        self.menu.addWidget(self.analyse_button)
-
-        self.reset = QtWidgets.QPushButton(self.centralwidget)
-        self.reset.setObjectName("reset")
-        self.reset.setEnabled(False)
-        self.menu.addWidget(self.reset)
-
-        self.files = QtWidgets.QListWidget(self.centralwidget)
-        self.files.setObjectName("files")
-        self.files.currentRowChanged.connect(self.change_image)
-        self.menu.addWidget(self.files)
         self.mainLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.menu)
 
 
@@ -201,6 +213,27 @@ class Ui_MainWindow(object):
         self.image_type_layout.setRowMinimumHeight(3, 60)
         self.image_type_layout.setRowMinimumHeight(4, 60)
         self.image_select_layout.addLayout(self.image_type_layout)
+
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_select_layout.addItem(spacerItem5)
+
+        self.cycle_layout = QtWidgets.QHBoxLayout()
+        self.cycle_layout.setObjectName("cycle_layout")
+
+        self.cycle_prev_button = QtWidgets.QPushButton(self.select)
+        self.cycle_prev_button.setObjectName("cycle_prev_button")
+        self.cycle_prev_button.clicked.connect(self.cycle_prev)
+        self.cycle_prev_button.setEnabled(False)
+        self.cycle_layout.addWidget(self.cycle_prev_button)
+
+        self.cycle_next_button = QtWidgets.QPushButton(self.select)
+        self.cycle_next_button.setObjectName("cycle_next_button")
+        self.cycle_next_button.clicked.connect(self.cycle_next)
+        self.cycle_next_button.setEnabled(False)
+        self.cycle_layout.addWidget(self.cycle_next_button)
+
+        self.image_select_layout.addLayout(self.cycle_layout)
+
         spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.image_select_layout.addItem(spacerItem4)
         self.image_select_confirm_layout = QtWidgets.QHBoxLayout()
@@ -364,7 +397,7 @@ class Ui_MainWindow(object):
         self.select_button.setText(_translate("MainWindow", "Sélection"))
         self.detection_button.setText(_translate("MainWindow", "Détection"))
         self.analyse_button.setText(_translate("MainWindow", "Analyse"))
-        self.reset.setText(_translate("MainWindow", ""))
+        self.calculs_button.setText(_translate("MainWindow", "Calculs"))
         self.welcome_message_1.setText(_translate("MainWindow", "Bienvenue"))
         self.welcome_message_2.setText(_translate("MainWindow", "Veuillez ouvrir un dossier contenant vos images"))
         self.image_select_label.setText(_translate("MainWindow", "Confirmer les images à traiter"))
@@ -374,6 +407,8 @@ class Ui_MainWindow(object):
         self.type_3s_label.setText(_translate("MainWindow", "Echantillon 3 : Surnageant"))
         self.type_1c_label.setText(_translate("MainWindow", "Echantillon 1 : Culot"))
         self.type_3c_label.setText(_translate("MainWindow", "Echantillon 3 : Culot"))
+        self.cycle_next_button.setText(_translate("MainWindow", "Echantillon suivant"))
+        self.cycle_prev_button.setText(_translate("MainWindow", "Echantillon précédent"))
         self.image_select_confirm.setText(_translate("MainWindow", "Valider"))
         self.image_select_deny.setText(_translate("MainWindow", "Annuler"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
@@ -392,11 +427,17 @@ class Ui_MainWindow(object):
 
     def change_page_2(self):
         self.browser.setCurrentIndex(2)
-        self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'], 2)
+        if 'pred' in self.images[self.files.currentItem().text()]:
+            self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 2)
+        else:
+            self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'], 2)            
 
     def change_page_3(self):
         self.browser.setCurrentIndex(3)
         self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 3)
+
+    def change_page_4(self):
+        self.browser.setCurrentIndex(4)
 
     def openfile(self):
         self.files.clear()
@@ -407,6 +448,12 @@ class Ui_MainWindow(object):
         self.type_2c.clear()
         self.type_3c.clear()
 
+        self.detection_button.setEnabled(False)
+        self.analyse_button.setEnabled(False)
+        self.calculs_button.setEnabled(False)
+        self.cycle_next_button.setEnabled(False)
+        self.cycle_prev_button.setEnabled(False)
+
         self.folder = str(QtWidgets.QFileDialog.getExistingDirectory(MainWindow, "Sélectionner un dossier"))
         if self.folder:
             for file in os.listdir(self.folder):
@@ -416,17 +463,20 @@ class Ui_MainWindow(object):
 
                     if name[-2:] == '1s':
                         self.type_1s.addItem(file)
-                    if name[-2:] == '1c':
+                    elif name[-2:] == '1c':
                         self.type_1c.addItem(file)
-                    if name[-2:] == '2s':
+                    elif name[-2:] == '2s':
                         self.type_2s.addItem(file)
-                    if name[-2:] == '2c':
+                    elif name[-2:] == '2c':
                         self.type_2c.addItem(file)
-                    if name[-2:] == '3s':
+                    elif name[-2:] == '3s':
                         self.type_3s.addItem(file)
-                    if name[-2:] == '3c':
+                    elif name[-2:] == '3c':
                         self.type_3c.addItem(file)
-                        
+        
+        if self.type_1s.count() > 1:
+            self.cycle_next_button.setEnabled(True)
+
         self.select_button.setEnabled(True)            
         self.change_page_1()
 
@@ -442,7 +492,6 @@ class Ui_MainWindow(object):
         self.loadimages()
         self.browser.setCurrentIndex(2)
         self.files.setCurrentRow(0)
-        # self.set_image_from_cv(self.images[self.files.currentItem().text()]['image'])
         
 
     def reset_file(self):
@@ -453,6 +502,36 @@ class Ui_MainWindow(object):
         self.type_1c.clear()
         self.type_2c.clear()
         self.type_3c.clear()
+
+    def cycle_next(self):
+        if self.type_1s.count() > self.type_1s.currentIndex()+1 and self.type_1c.count() > self.type_1c.currentIndex()+1 and self.type_2s.count() > self.type_2s.currentIndex()+1 and self.type_2c.count() > self.type_2c.currentIndex()+1 and self.type_3s.count() > self.type_3s.currentIndex()+1 and self.type_3c.count() > self.type_3c.currentIndex()+1:
+            self.type_1s.setCurrentIndex(self.type_1s.currentIndex() + 1)
+            self.type_1c.setCurrentIndex(self.type_1c.currentIndex() + 1)
+            self.type_2s.setCurrentIndex(self.type_2s.currentIndex() + 1)
+            self.type_2c.setCurrentIndex(self.type_2c.currentIndex() + 1)
+            self.type_3s.setCurrentIndex(self.type_3s.currentIndex() + 1)
+            self.type_3c.setCurrentIndex(self.type_3c.currentIndex() + 1)
+            self.cycle_prev_button.setEnabled(True)
+            print(self.type_2c.count())
+            print(self.type_2c.currentIndex())
+        else:
+            self.cycle_next_button.setEnabled(False)
+
+
+
+    def cycle_prev(self):
+        if self.type_1s.currentIndex() > 0:
+            self.type_1s.setCurrentIndex(self.type_1s.currentIndex() - 1)
+            self.type_1c.setCurrentIndex(self.type_1c.currentIndex() - 1)
+            self.type_2s.setCurrentIndex(self.type_2s.currentIndex() - 1)
+            self.type_2c.setCurrentIndex(self.type_2c.currentIndex() - 1)
+            self.type_3s.setCurrentIndex(self.type_3s.currentIndex() - 1)
+            self.type_3c.setCurrentIndex(self.type_3c.currentIndex() - 1)
+            self.cycle_next_button.setEnabled(True)
+
+        else: 
+            self.cycle_prev_button.setEnabled(False)
+
 
     
     def loadimages(self):
@@ -516,6 +595,16 @@ class Ui_MainWindow(object):
         self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 2)
         self.analyse_button.setEnabled(True)
 
+        all_done = True
+        for key in self.images:
+            if 'pred' not in self.images[key]:
+                all_done = False
+
+        if all_done:
+            self.calculs_button.setEnabled(True)
+
+
+
     def show_detection(self):
         combined_image = utils.show_all_detections(self.images[self.files.currentItem().text()])
         self.set_image_from_cv(combined_image, 3)
@@ -535,10 +624,9 @@ if __name__ == "__main__":
     file = QtCore.QFile('Assets:Style.qss')
     file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
     app.setStyleSheet(str(file.readAll(), 'utf-8'))
-    
+
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-
     sys.exit(app.exec_())
