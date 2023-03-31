@@ -307,7 +307,7 @@ class Ui_MainWindow(object):
         self.taux_conf = QtWidgets.QSpinBox(self.detect)
         self.taux_conf.setMaximum(100)
         self.taux_conf.setAccelerated(True)
-        self.taux_conf.setProperty("value", 95)
+        self.taux_conf.setProperty("value", 5)
         self.taux_conf.setObjectName("taux_conf")
         self.taux_conf_layout.addWidget(self.taux_conf)
         self.detect_tool_layout.addLayout(self.taux_conf_layout)
@@ -346,22 +346,11 @@ class Ui_MainWindow(object):
         self.show_detection_button.clicked.connect(self.show_detection)
         self.analyse_tool.addWidget(self.show_detection_button)
 
-        self.mallassez_button = QtWidgets.QPushButton(self.analyse)
-        self.mallassez_button.setObjectName("mallassez_button")
-        self.mallassez_button.clicked.connect(self.mallassez_calc)
-        self.analyse_tool.addWidget(self.mallassez_button)
-
-        self.mallassez_clean_result = QtWidgets.QLineEdit(self.analyse)
-        self.mallassez_clean_result.setAlignment(QtCore.Qt.AlignCenter)
-        self.mallassez_clean_result.setReadOnly(True)
-        self.mallassez_clean_result.setObjectName("mallassez_clean_result")
-        self.analyse_tool.addWidget(self.mallassez_clean_result)
-
-        self.mallassez_dirty_result = QtWidgets.QLineEdit(self.analyse)
-        self.mallassez_dirty_result.setAlignment(QtCore.Qt.AlignCenter)
-        self.mallassez_dirty_result.setReadOnly(True)
-        self.mallassez_dirty_result.setObjectName("mallassez_dirty_result")
-        self.analyse_tool.addWidget(self.mallassez_dirty_result)
+        self.show_pred_button = QtWidgets.QPushButton(self.analyse)
+        self.show_pred_button.setObjectName("show_pred_button")
+        self.show_pred_button.clicked.connect(self.show_pred)
+        self.show_pred_button.setEnabled(False)
+        self.analyse_tool.addWidget(self.show_pred_button)
 
         self.analyse_layout.addLayout(self.analyse_tool)
         self.analyse_layout.addWidget(self.analyse_viewer)
@@ -418,8 +407,9 @@ class Ui_MainWindow(object):
         self.box_width_label.setText(_translate("MainWindow", "Épaisseur des boites"))
         self.start_detect_one.setText(_translate("MainWindow", "Lancer la détection sur cette image"))
         self.start_detect_many.setText(_translate("MainWindow", "Lancer la détection sur toutes les images"))
-        self.show_detection_button.setText(_translate("MainWindow", "Voir les cellules détectées"))
-        self.mallassez_button.setText(_translate("MainWindow", "Calcul de Mallassez"))
+        self.show_detection_button.setText(_translate("MainWindow", "Voir uniquement les cellules détectées"))
+        self.show_pred_button.setText(_translate("MainWindow", "Voir l'image"))
+
 
     
     def change_page_1(self):
@@ -545,6 +535,8 @@ class Ui_MainWindow(object):
         self.analyse_button.setEnabled(False)
      
     def change_image(self):
+        self.show_pred_button.setEnabled(False)
+        self.show_detection_button.setEnabled(True)
         try:
             self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'])
             self.analyse_button.setEnabled(True)
@@ -603,11 +595,16 @@ class Ui_MainWindow(object):
         if all_done:
             self.calculs_button.setEnabled(True)
 
-
-
     def show_detection(self):
         combined_image = utils.show_all_detections(self.images[self.files.currentItem().text()])
         self.set_image_from_cv(combined_image, 3)
+        self.show_pred_button.setEnabled(True)
+        self.show_detection_button.setEnabled(False)
+
+    def show_pred(self):
+        self.set_image_from_cv(self.images[self.files.currentItem().text()]['image_pred'], 3)
+        self.show_pred_button.setEnabled(False)
+        self.show_detection_button.setEnabled(True)
 
     def mallassez_calc(self):
         self.con_clean, self.con_dirty = utils.calcul_malassez(self.images[self.files.currentItem().text()])

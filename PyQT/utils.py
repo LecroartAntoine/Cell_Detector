@@ -1,55 +1,6 @@
 import cv2, os
 import numpy as np
 from ultralytics import YOLO
-
-def cropAuto(img, thresh):
-    src = img.copy()
-
-    # On ne garde que la dimension 1 (= Vert)
-    src[:,:,2] = np.zeros([src.shape[0], src.shape[1]])
-    src[:,:,0] = np.zeros([src.shape[0], src.shape[1]])
-
-    # Détection de contours
-    gray = cv2.cvtColor(src,cv2.COLOR_RGB2GRAY)
-    _,edge = cv2.threshold(gray, thresh, 1, cv2.THRESH_BINARY)
-    contours,_ = cv2.findContours(edge,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    try:
-        # On ne garde que le plus gros contour trouvé
-        nb_cont = 0
-        best = -1
-        for i, contour in enumerate(contours):
-            if len(contours[i]) > nb_cont:
-                nb_cont = len(contours[i])
-                best = i
-
-        # On trouve les dimensions du contour
-        xmin, xmax, ymin, ymax = 5000, 0, 5000, 0
-        for i, contour in enumerate(contours[best]):
-            if contour[0][0] > xmax:
-                xmax = contour[0][0] 
-
-            if contour[0][0] < xmin:
-                xmin = contour[0][0] 
-
-            if contour[0][1] > ymax:
-                ymax = contour[0][1] 
-
-            if contour[0][1] < ymin:
-                ymin = contour[0][1]
-
-        # Découpage de l'image avec les dimensions trouvées
-        cropped = img[ymin:ymax, xmin:xmax]
-
-        # Redimension de l'image par un multiple de 32
-        x = cropped.shape[0] if cropped.shape[0] > cropped.shape[1] else cropped.shape[1]
-        while x % 32 != 0:
-            x -= 1
-        resized = cv2.resize(cropped, (x, x), interpolation = cv2.INTER_AREA)
-
-        return resized
-    except:
-        return img
     
 def yolo_detection(image, confiance):
 
@@ -108,34 +59,62 @@ def box_label(image, box, label, color, thickness, txt_color=(255, 255, 255)):
 
 def show_all_detections(image):
 
-    liste_images = []
-    liste_images_h = []
-    nb_image = len(image['pred'].boxes.boxes)
-    fill = np.zeros((50, 50, 3), dtype = "uint8")
+    try:
+        liste_images = []
+        nb_image = len(image['pred'].boxes.boxes)
+        fill = np.zeros((50, 50, 3), dtype = "uint8")
 
-    for box in image['pred'].boxes.boxes:
+        for box in image['pred'].boxes.boxes:
 
-        cell = image['image'][int(box[1]):int(box[3]), int(box[0]):int(box[2])]
-        cell = cv2.resize(cell, (50, 50), interpolation=cv2.INTER_AREA)
-        liste_images.append(cell)
+            cell = image['image'][int(box[1]):int(box[3]), int(box[0]):int(box[2])]
+            cell = cv2.resize(cell, (50, 50), interpolation=cv2.INTER_AREA)
+            cell_bw = cv2.cvtColor(cell, cv2.COLOR_RGB2GRAY)
 
-    while int(nb_image**0.5)**2 != nb_image:
-        liste_images.append(fill)
-        nb_image += 1
+            row_black_avg = []
+            for row in cell_bw :
+                row_values = []
+                for pixel in row:
+                    if pixel < 200:
+                        row_values.append(pixel)
+                if row_values:
+                    row_black_avg.append(sum(row_values) / len(row_values))
+            if row_black_avg:
+                black_avg = round(sum(row_black_avg) / len(row_black_avg))
 
-    for i in range(0, nb_image, int(nb_image**0.5)):
+            liste_images.append([black_avg, cell])
 
-        liste_images_h.append(cv2.hconcat(liste_images[i:i+int(nb_image**0.5)]))
+        while int(nb_image**0.5)**2 != nb_image:
+            liste_images.append([0, fill])
+            nb_image += 1
 
-    while np.array_equal(liste_images_h[-1], np.zeros((50, 50 * int(nb_image**0.5), 3), dtype = "uint8")):
-        liste_images_h.pop(-1)
-        
-    image_combin = cv2.vconcat(liste_images_h)
+        liste_images = [image[1] for image in sorted(liste_images, key=lambda x: x[0], reverse=True)]
+
+        liste_images_h = []
+        for i in range(0, nb_image, int(nb_image**0.5)):
+
+            liste_images_h.append(cv2.hconcat(liste_images[i:i+int(nb_image**0.5)]))
+
+        while np.array_equal(liste_images_h[-1], np.zeros((50, 50 * int(nb_image**0.5), 3), dtype = "uint8")):
+            liste_images_h.pop(-1)
+            
+        image_combin = cv2.vconcat(liste_images_h)
+
+    except:
+        # image = np.zeros((200, 200, 3), dtype = "uint8")
+        # cv2.putText(image,
+        #             '', 
+        #             (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
+        #             0,
+        #             thickness / 3,
+        #             txt_color,
+        #             thickness=tf,
+        #             lineType=cv2.LINE_AA)
+        image_combin = np.zeros((200, 200, 3), dtype = "uint8")
 
     return image_combin
 
-HEIGHT_SQUARE = 186
-WIDTH_SQUARE = 230
+HEIGHT_SQUARE = 462
+WIDTH_SQUARE = 580
 
 def calcul_malassez(image):
     liste_nb_cells_clean = []
@@ -173,20 +152,20 @@ def calcul_malassez(image):
 
     return (concentration_clean, concentration_dirty)
 
-def calcul_recouvrement(image):
-    liste_dirty_cell_avg_black = []
-    liste_detection = pred.boxes.boxes
-    image_bw = image
+# def calcul_recouvrement(image):
+#     liste_dirty_cell_avg_black = []
+#     liste_detection = pred.boxes.boxes
+#     image_bw = image
 
-    for box in liste_detection[:]:
-        if box[-1] == 1:
-            select = image_bw[box[1]:box[3], box[0]:box[2]].copy()
-            row_avg = []
-            for row in select :
-                row_avg.append(sum(row) / len(row))
+#     for box in liste_detection[:]:
+#         if box[-1] == 1:
+#             select = image_bw[box[1]:box[3], box[0]:box[2]].copy()
+#             row_avg = []
+#             for row in select :
+#                 row_avg.append(sum(row) / len(row))
 
-            liste_dirty_cell_avg_black.append(sum(row_avg) / len(row_avg))
+#             liste_dirty_cell_avg_black.append(sum(row_avg) / len(row_avg))
 
-    return(sum(liste_dirty_cell_avg_black) / len(liste_dirty_cell_avg_black))
+#     return(sum(liste_dirty_cell_avg_black) / len(liste_dirty_cell_avg_black))
             
 
