@@ -23,6 +23,7 @@ class DetectThread(QtCore.QThread):
         else:
             for key in self.images:
                 self.images[key]['pred'] = utils.yolo_detection(self.images[key]['image'], self.taux_conf / 100)
+                self.images[key]['nb_cell'] = len(self.images[key]['pred'].boxes.boxes)
                 self.images[key]['image_pred'] = utils.plot_bboxes(self.images[key]['image'], self.images[key]['pred'].boxes.boxes, self.box_width, self.show_conf, self.show_name)
         
         self.finished.emit(self.images)
@@ -378,11 +379,13 @@ class Ui_MainWindow(object):
         self.calc_button_save_xlsx = QtWidgets.QPushButton(self.calculs)
         self.calc_button_save_xlsx.setObjectName("calc_button_save_xlsx")
         self.calc_button_save_xlsx.setEnabled(False)
+        self.calc_button_save_xlsx.clicked.connect(self.save_table_xlsx)
         self.calc_buttons_layout.addWidget(self.calc_button_save_xlsx)
 
         self.calc_button_save_csv = QtWidgets.QPushButton(self.calculs)
         self.calc_button_save_csv.setObjectName("calc_button_save_csv")
         self.calc_button_save_csv.setEnabled(False)
+        self.calc_button_save_csv.clicked.connect(self.save_table_csv)
         self.calc_buttons_layout.addWidget(self.calc_button_save_csv)
         self.calculs_layout.addLayout(self.calc_buttons_layout)
 
@@ -391,7 +394,7 @@ class Ui_MainWindow(object):
         self.calculs_table.setObjectName("calculs_table")
         self.calculs_table.setColumnCount(4)
         self.calculs_table.setRowCount(6)
-        self.calculs_table.setTextAlignment(4)
+        QtWidgets.QTableWidgetItem().setTextAlignment(4)
         self.calculs_table.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem())
         self.calculs_table.setVerticalHeaderItem(1, QtWidgets.QTableWidgetItem())
         self.calculs_table.setVerticalHeaderItem(2, QtWidgets.QTableWidgetItem())
@@ -471,12 +474,12 @@ class Ui_MainWindow(object):
         self.start_calc_button.setText(_translate("MainWindow", "Lancer les calculs"))
         self.calc_button_save_xlsx.setText(_translate("MainWindow", "Sauvegarder au format .xlsx"))
         self.calc_button_save_csv.setText(_translate("MainWindow", "Sauvegarder au format .csv"))
-        self.calculs_table.verticalHeaderItem(0).setText(_translate("MainWindow", "Concentration surnageant"))
-        self.calculs_table.verticalHeaderItem(1).setText(_translate("MainWindow", "Concentration culot"))
-        self.calculs_table.verticalHeaderItem(2).setText(_translate("MainWindow", "Nombre de cellules total"))
-        self.calculs_table.verticalHeaderItem(3).setText(_translate("MainWindow", "Nombre capturées"))
-        self.calculs_table.verticalHeaderItem(4).setText(_translate("MainWindow", "Nombre non-capturées"))
-        self.calculs_table.verticalHeaderItem(5).setText(_translate("MainWindow", "Ratio de capture"))
+        self.calculs_table.verticalHeaderItem(0).setText(_translate("MainWindow", "Nombre de cellules total"))
+        self.calculs_table.verticalHeaderItem(1).setText(_translate("MainWindow", "Nombre capturées"))
+        self.calculs_table.verticalHeaderItem(2).setText(_translate("MainWindow", "Nombre non-capturées"))
+        self.calculs_table.verticalHeaderItem(3).setText(_translate("MainWindow", "Ratio de capture"))
+        self.calculs_table.verticalHeaderItem(4).setText(_translate("MainWindow", "Concentration culot"))
+        self.calculs_table.verticalHeaderItem(5).setText(_translate("MainWindow", "Concentration surnageant"))
         self.calculs_table.horizontalHeaderItem(0).setText(_translate("MainWindow", "Echantillon 1"))
         self.calculs_table.horizontalHeaderItem(1).setText(_translate("MainWindow", "Echantillon 2"))
         self.calculs_table.horizontalHeaderItem(2).setText(_translate("MainWindow", "Echantillon 3"))
@@ -513,6 +516,8 @@ class Ui_MainWindow(object):
         self.calculs_button.setEnabled(False)
         self.cycle_next_button.setEnabled(False)
         self.cycle_prev_button.setEnabled(False)
+        self.calc_button_save_csv.setEnabled(False)
+        self.calc_button_save_xlsx.setEnabled(False)
 
         self.folder = str(QtWidgets.QFileDialog.getExistingDirectory(MainWindow, "Sélectionner un dossier"))
         if self.folder:
@@ -600,6 +605,8 @@ class Ui_MainWindow(object):
             image = cv2.imdecode(np.fromfile(self.folder + '/' + item, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             self.images[item] = {'image' : image}
+            self.images[item]['type'] = re.findall('^.*(?=\.[^.]*$)', item.lower())[0][-1]
+            self.images[item]['echantillon'] = re.findall('^.*(?=\.[^.]*$)', item.lower())[0][-2]
 
         self.detection_button.setEnabled(True)
         self.analyse_button.setEnabled(False)
@@ -678,14 +685,102 @@ class Ui_MainWindow(object):
 
     def start_calc(self):
         self.images = utils.calcul_malassez(self.images)
+        self.set_calculs()
 
+    def set_calculs(self):
+        for key in self.images:
 
-    # def mallassez_calc(self):
+            if self.images[key]['type'] == 'c':
+                self.calculs_table.setItem(1, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
+                self.calculs_table.setItem(4, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + "x10\u2075"))
 
-    #     self.images = utils.calcul_malassez(self.images)
+            elif self.images[key]['type'] == 's':
+                self.calculs_table.setItem(2, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
+                self.calculs_table.setItem(5, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + "x10\u2075"))
 
-    #     self.mallassez_clean_result.setText(str(round(self.con_clean,2)) + "x10\u2075")
-    #     self.mallassez_dirty_result.setText(str(round(self.con_dirty,2)) + "x10\u2075")
+        e1_c_nb = int(self.calculs_table.item(1, 0).text())
+        e2_c_nb = int(self.calculs_table.item(1, 1).text())
+        e3_c_nb = int(self.calculs_table.item(1, 2).text())
+        e1_s_nb = int(self.calculs_table.item(2, 0).text())
+        e2_s_nb = int(self.calculs_table.item(2, 1).text())
+        e3_s_nb = int(self.calculs_table.item(2, 2).text())
+
+        e1_c_con = float(self.calculs_table.item(4, 0).text()[:-4])
+        e2_c_con = float(self.calculs_table.item(4, 1).text()[:-4])
+        e3_c_con = float(self.calculs_table.item(4, 2).text()[:-4])
+        e1_s_con = float(self.calculs_table.item(5, 0).text()[:-4])
+        e2_s_con = float(self.calculs_table.item(5, 1).text()[:-4])
+        e3_s_con = float(self.calculs_table.item(5, 2).text()[:-4])
+
+        e1_nb = e1_c_nb + e1_s_nb
+        e2_nb = e2_c_nb + e2_s_nb
+        e3_nb = e3_c_nb + e3_s_nb
+
+        self.calculs_table.setItem(0, 0, QtWidgets.QTableWidgetItem(str(e1_nb)))
+        self.calculs_table.setItem(0, 1, QtWidgets.QTableWidgetItem(str(e2_nb)))
+        self.calculs_table.setItem(0, 2, QtWidgets.QTableWidgetItem(str(e3_nb)))
+
+        e1_ratio = round(e1_c_nb / e1_nb * 100, 1)
+        e2_ratio = round(e2_c_nb / e2_nb * 100, 1)
+        e3_ratio = round(e3_c_nb / e3_nb * 100, 1)
+
+        self.calculs_table.setItem(3, 0, QtWidgets.QTableWidgetItem(str(e1_ratio) + "%"))
+        self.calculs_table.setItem(3, 1, QtWidgets.QTableWidgetItem(str(e2_ratio) + "%"))
+        self.calculs_table.setItem(3, 2, QtWidgets.QTableWidgetItem(str(e3_ratio) + "%"))
+
+        self.calculs_table.setItem(0, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_nb, e2_nb, e3_nb]))))
+        self.calculs_table.setItem(1, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_c_nb, e2_c_nb, e3_c_nb]))))
+        self.calculs_table.setItem(2, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_s_nb, e2_s_nb, e3_s_nb]))))
+        self.calculs_table.setItem(3, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_ratio, e2_ratio, e3_ratio]))))
+        self.calculs_table.setItem(4, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_c_con, e2_c_con, e3_c_con]))))
+        self.calculs_table.setItem(5, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_s_con, e2_s_con, e3_s_con]))))
+
+        self.calc_button_save_csv.setEnabled(True)
+        self.calc_button_save_xlsx.setEnabled(True)
+
+    def save_table_csv(self):
+        import csv
+        path, ok = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Sauvegarder', os.getenv('HOME'), 'CSV(*.csv)')
+        headers = [""] + [self.calculs_table.horizontalHeaderItem(i).text() for i in range(self.calculs_table.columnCount())]
+        if ok:
+            with open(path, "w", encoding = 'utf-8', newline="") as file:
+
+                writer = csv.writer(file)
+
+                writer.writerow(headers)
+
+                for row in range(self.calculs_table.rowCount()):
+                    row_data = [self.calculs_table.verticalHeaderItem(row).text()]
+                    for column in range(self.calculs_table.columnCount()):
+                        item = self.calculs_table.item(row, column)
+                        row_data.append(item.text())
+
+                    writer.writerow(row_data)
+
+    def save_table_xlsx(self):
+        from openpyxl import Workbook
+
+        path, ok = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Sauvegarder', os.getenv('HOME'), 'EXEL(*.xlsx)')
+
+        if ok:
+            workbook = Workbook()
+
+            worksheet = workbook.active
+
+            for row in range(self.calculs_table.rowCount()):
+                for column in range(self.calculs_table.columnCount()):
+                    item = self.calculs_table.item(row, column)
+                    worksheet.cell(row=row+2, column=column+2, value=item.text())
+
+            for column in range(self.calculs_table.columnCount()):
+                header_cell = worksheet.cell(row=1, column=column+2)
+                header_cell.value = self.calculs_table.horizontalHeaderItem(column).text()
+
+            for row in range(self.calculs_table.rowCount()):
+                header_cell = worksheet.cell(row=row+2, column=1)
+                header_cell.value = self.calculs_table.verticalHeaderItem(row).text()
+
+            workbook.save(filename=path)
 
 
 if __name__ == "__main__":

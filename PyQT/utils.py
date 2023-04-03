@@ -143,6 +143,15 @@ def calcul_malassez(images):
 
     return (images)
 
+def get_std(liste):
+
+    mean = sum(liste) / len(liste)
+    differences = [x - mean for x in liste]
+    squared_differences = [x ** 2 for x in differences]
+    mean_squared_differences = sum(squared_differences) / len(squared_differences)
+    std = mean_squared_differences ** 0.5
+    return(round(std, 2))
+
 # def calcul_recouvrement(image):
 #     liste_dirty_cell_avg_black = []
 #     liste_detection = pred.boxes.boxes
