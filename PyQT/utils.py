@@ -116,41 +116,32 @@ def show_all_detections(image):
 HEIGHT_SQUARE = 462
 WIDTH_SQUARE = 580
 
-def calcul_malassez(image):
-    liste_nb_cells_clean = []
-    liste_nb_cells_dirty = []
-    liste_detection = [box.tolist() for box in image['pred'].boxes.boxes]
+def calcul_malassez(images):
 
-    for y in range(image['image'].shape[0]//HEIGHT_SQUARE):
-        for x in range(image['image'].shape[1]//WIDTH_SQUARE):
-            x_min = x * WIDTH_SQUARE
-            x_max = x * WIDTH_SQUARE + WIDTH_SQUARE
-            y_min = y * HEIGHT_SQUARE
-            y_max = y * HEIGHT_SQUARE + HEIGHT_SQUARE
-            nb_cells_clean = 0
-            nb_cells_dirty = 0
+    for key in images:
+        liste_nb_cells = []
+        liste_detection = [box.tolist() for box in images[key]['pred'].boxes.boxes]
+
+        for y in range(images[key]['image'].shape[0]//HEIGHT_SQUARE):
+            for x in range(images[key]['image'].shape[1]//WIDTH_SQUARE):
+                x_min = x * WIDTH_SQUARE
+                x_max = x * WIDTH_SQUARE + WIDTH_SQUARE
+                y_min = y * HEIGHT_SQUARE
+                y_max = y * HEIGHT_SQUARE + HEIGHT_SQUARE
+                nb_cells = 0
 
 
-            for box in liste_detection[:]:
-                if box[-1] == 0:
+                for box in liste_detection[:]:
+                    
                     if box[0] > x_min and box[0] < x_max and box[3] > y_min and box[3] < y_max:
-                        nb_cells_clean += 1
+                        nb_cells += 1
                         liste_detection.remove(box)
 
+                liste_nb_cells.append(nb_cells)
 
-                elif box[-1] == 1:
-                    if box[0] > x_min and box[0] < x_max and box[3] > y_min and box[3] < y_max:
-                        nb_cells_dirty += 1
-                        liste_detection.remove(box)
+        images[key]['concentration'] = (sum(liste_nb_cells) / (len(liste_nb_cells)))
 
-
-            liste_nb_cells_clean.append(nb_cells_clean)
-            liste_nb_cells_dirty.append(nb_cells_dirty)
-
-    concentration_clean = (sum(liste_nb_cells_clean) / (len(liste_nb_cells_clean)))
-    concentration_dirty = (sum(liste_nb_cells_dirty) / (len(liste_nb_cells_dirty)))
-
-    return (concentration_clean, concentration_dirty)
+    return (images)
 
 # def calcul_recouvrement(image):
 #     liste_dirty_cell_avg_black = []

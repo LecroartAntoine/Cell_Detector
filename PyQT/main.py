@@ -359,6 +359,65 @@ class Ui_MainWindow(object):
 
         self.mainLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.browser)
 
+#####################################  Calculs  ########################################################
+
+        self.calculs = QtWidgets.QWidget()
+        self.calculs.setObjectName("calculs")
+
+        self.calculs_layout = QtWidgets.QVBoxLayout(self.calculs)
+        self.calculs_layout.setObjectName("calculs_layout")
+
+        self.calc_buttons_layout = QtWidgets.QHBoxLayout()
+        self.calc_buttons_layout.setObjectName("Calc_buttons_layout")
+        self.start_calc_button = QtWidgets.QPushButton(self.calculs)
+        self.start_calc_button.setObjectName("start_calc_button")
+        self.start_calc_button.clicked.connect(self.start_calc)
+        self.calc_buttons_layout.addWidget(self.start_calc_button)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.calc_buttons_layout.addItem(spacerItem)
+        self.calc_button_save_xlsx = QtWidgets.QPushButton(self.calculs)
+        self.calc_button_save_xlsx.setObjectName("calc_button_save_xlsx")
+        self.calc_button_save_xlsx.setEnabled(False)
+        self.calc_buttons_layout.addWidget(self.calc_button_save_xlsx)
+
+        self.calc_button_save_csv = QtWidgets.QPushButton(self.calculs)
+        self.calc_button_save_csv.setObjectName("calc_button_save_csv")
+        self.calc_button_save_csv.setEnabled(False)
+        self.calc_buttons_layout.addWidget(self.calc_button_save_csv)
+        self.calculs_layout.addLayout(self.calc_buttons_layout)
+
+        self.calculs_table = QtWidgets.QTableWidget(self.calculs)
+        self.calculs_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
+        self.calculs_table.setObjectName("calculs_table")
+        self.calculs_table.setColumnCount(4)
+        self.calculs_table.setRowCount(6)
+        self.calculs_table.setTextAlignment(4)
+        self.calculs_table.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setVerticalHeaderItem(1, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setVerticalHeaderItem(2, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setVerticalHeaderItem(3, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setVerticalHeaderItem(4, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setVerticalHeaderItem(5, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem())
+        self.calculs_table.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem())
+        col_header = self.calculs_table.horizontalHeader()       
+        col_header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        col_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        col_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        col_header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+        row_header = self.calculs_table.verticalHeader()       
+        row_header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        row_header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        row_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        row_header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+        row_header.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
+        row_header.setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
+
+        self.calculs_layout.addWidget(self.calculs_table)
+        self.browser.addWidget(self.calculs)
+
 #####################################  div  ########################################################
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -409,8 +468,19 @@ class Ui_MainWindow(object):
         self.start_detect_many.setText(_translate("MainWindow", "Lancer la détection sur toutes les images"))
         self.show_detection_button.setText(_translate("MainWindow", "Voir uniquement les cellules détectées"))
         self.show_pred_button.setText(_translate("MainWindow", "Voir l'image"))
-
-
+        self.start_calc_button.setText(_translate("MainWindow", "Lancer les calculs"))
+        self.calc_button_save_xlsx.setText(_translate("MainWindow", "Sauvegarder au format .xlsx"))
+        self.calc_button_save_csv.setText(_translate("MainWindow", "Sauvegarder au format .csv"))
+        self.calculs_table.verticalHeaderItem(0).setText(_translate("MainWindow", "Concentration surnageant"))
+        self.calculs_table.verticalHeaderItem(1).setText(_translate("MainWindow", "Concentration culot"))
+        self.calculs_table.verticalHeaderItem(2).setText(_translate("MainWindow", "Nombre de cellules total"))
+        self.calculs_table.verticalHeaderItem(3).setText(_translate("MainWindow", "Nombre capturées"))
+        self.calculs_table.verticalHeaderItem(4).setText(_translate("MainWindow", "Nombre non-capturées"))
+        self.calculs_table.verticalHeaderItem(5).setText(_translate("MainWindow", "Ratio de capture"))
+        self.calculs_table.horizontalHeaderItem(0).setText(_translate("MainWindow", "Echantillon 1"))
+        self.calculs_table.horizontalHeaderItem(1).setText(_translate("MainWindow", "Echantillon 2"))
+        self.calculs_table.horizontalHeaderItem(2).setText(_translate("MainWindow", "Echantillon 3"))
+        self.calculs_table.horizontalHeaderItem(3).setText(_translate("MainWindow", "Écart Type"))
     
     def change_page_1(self):
         self.browser.setCurrentIndex(1)
@@ -606,11 +676,16 @@ class Ui_MainWindow(object):
         self.show_pred_button.setEnabled(False)
         self.show_detection_button.setEnabled(True)
 
-    def mallassez_calc(self):
-        self.con_clean, self.con_dirty = utils.calcul_malassez(self.images[self.files.currentItem().text()])
+    def start_calc(self):
+        self.images = utils.calcul_malassez(self.images)
 
-        self.mallassez_clean_result.setText(str(round(self.con_clean,2)) + "x10\u2075")
-        self.mallassez_dirty_result.setText(str(round(self.con_dirty,2)) + "x10\u2075")
+
+    # def mallassez_calc(self):
+
+    #     self.images = utils.calcul_malassez(self.images)
+
+    #     self.mallassez_clean_result.setText(str(round(self.con_clean,2)) + "x10\u2075")
+    #     self.mallassez_dirty_result.setText(str(round(self.con_dirty,2)) + "x10\u2075")
 
 
 if __name__ == "__main__":

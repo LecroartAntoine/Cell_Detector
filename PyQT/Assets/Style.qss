@@ -584,121 +584,59 @@ QTableView
 {
     background-color: #242526;
     border: 1px solid #32414B;
-    color: #f0f0f0;
-    gridline-color: #8faaff;
-    outline : 0;
-
-}
-
-
-QTableView::disabled
-{
-    background-color: #242526;
-    border: 1px solid #32414B;
-    color: #242F62;
-    gridline-color: #242F62;
-    outline : 0;
-
-}
-
-
-QTableView::item:hover 
-{
-    background-color: #26264f;
-    color: #f0f0f0;
-
-}
-
-
-QTableView::item:selected 
-{
-    background-color: #1a1b1c;
-    border: 2px solid #4969ff;
     color: #F0F0F0;
-
+    gridline-color: #353635;
+    outline : 0;
+	font-weight: bold;
+	font-family : Trebuchet MS;
+	font-size : 30px;
 }
-
-
-QTableView::item:selected:disabled
-{
-    background-color: #1a1b1c;
-    border: 2px solid #242F62;
-    color: #242F62;
-
-}
-
 
 QTableCornerButton::section
 {
     background-color: #505050;
-    color: #fff;
-
+    color: white;
 }
 
+QHeaderView
+{
+    background-color: #505050;
+    color: white;
+    border-radius: 0px;
+    text-align: left;
+
+}
 
 QHeaderView::section
 {
-    background-color: #242F62;
-    color: #fff;
+    background-color: #505050;
+    color: white;
+    border-radius: 0px;
     text-align: left;
-	padding: 4px;
-	
+	padding: 3px;
 }
-
-
-QHeaderView::section:disabled
-{
-    background-color: #242F62;
-    color: #242F62;
-
-}
-
-
-QHeaderView::section:checked
-{
-    color: #fff;
-    background-color: #4969ff;
-
-}
-
-
-QHeaderView::section:checked:disabled
-{
-    color: #242F62;
-    background-color: #242F62;
-
-}
-
 
 QHeaderView::section::vertical::first,
 QHeaderView::section::vertical::only-one
 {
     border-top: 1px solid #353635;
-
 }
-
 
 QHeaderView::section::vertical
 {
     border-top: 1px solid #353635;
-
 }
-
 
 QHeaderView::section::horizontal::first,
 QHeaderView::section::horizontal::only-one
 {
     border-left: 1px solid #353635;
-
 }
-
 
 QHeaderView::section::horizontal
 {
     border-left: 1px solid #353635;
-
 }
-
 
 /*-----QTabWidget-----*/
 QTabBar::tab
@@ -728,14 +666,14 @@ QTabWidget::pane
 	background-color: #262626;
 	color: #ffffff;
     border: 1px solid;
-    border-color: #607cff;
+    border-color: #4969ff;
 
 }
 
 
 QTabBar::tab:selected
 {
-    background-color: #607cff;
+    background-color: #4969ff;
 	color: #ffffff;
 	border-style: solid;
 	border-width: 1px;
@@ -764,7 +702,7 @@ QTabBar::tab:!selected
 
 QTabBar::tab:!selected:hover 
 {
-    background-color: #607cff;
+    background-color: #4969ff;
 
 }
 
