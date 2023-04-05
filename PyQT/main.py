@@ -1,7 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import os, cv2, psutil, ImageViewer, sys, re
+import os, cv2, psutil, ImageViewer, sys, re, utils
 import numpy as np
-import utils
 
 class DetectThread(QtCore.QThread):
     finished = QtCore.pyqtSignal(object)
@@ -33,7 +32,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
 
-        self.images = {}
+        # self.images = {}
 
         # Image Viewer
         self.detect_viewer = ImageViewer.PhotoViewer(MainWindow)
@@ -45,14 +44,6 @@ class Ui_MainWindow(object):
         self.mainLayout = QtWidgets.QFormLayout(self.centralwidget)
         self.mainLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
         self.mainLayout.setObjectName("mainLayout")
-
-# #####################################  Infos  ########################################################
-#         self.infos = QtWidgets.QHBoxLayout()
-#         self.infos.setSpacing(20)
-#         self.infos.setObjectName("infos")
-       
-        
-#         self.mainLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.infos)
 
 #################################  MENU  ##################################################
         self.menu = QtWidgets.QVBoxLayout()
@@ -600,7 +591,8 @@ class Ui_MainWindow(object):
 
     
     def loadimages(self):
-        
+
+        self.images = {}
         for item in [item.text() for item in [self.files.item(i) for i in range(self.files.count())]]:
             image = cv2.imdecode(np.fromfile(self.folder + '/' + item, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

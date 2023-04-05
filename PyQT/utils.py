@@ -100,15 +100,6 @@ def show_all_detections(image):
         image_combin = cv2.vconcat(liste_images_h)
 
     except:
-        # image = np.zeros((200, 200, 3), dtype = "uint8")
-        # cv2.putText(image,
-        #             '', 
-        #             (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
-        #             0,
-        #             thickness / 3,
-        #             txt_color,
-        #             thickness=tf,
-        #             lineType=cv2.LINE_AA)
         image_combin = np.zeros((200, 200, 3), dtype = "uint8")
 
     return image_combin
@@ -167,5 +158,3 @@ def get_std(liste):
 #             liste_dirty_cell_avg_black.append(sum(row_avg) / len(row_avg))
 
 #     return(sum(liste_dirty_cell_avg_black) / len(liste_dirty_cell_avg_black))
-            
-
