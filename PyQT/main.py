@@ -684,7 +684,7 @@ class Ui_MainWindow(object):
 
             if self.images[key]['type'] == 'c':
                 self.calculs_table.setItem(1, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
-                self.calculs_table.setItem(4, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + "x10\u2075"))
+                self.calculs_table.setItem(4, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + ""))
 
             elif self.images[key]['type'] == 's':
                 self.calculs_table.setItem(2, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
