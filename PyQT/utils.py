@@ -6,7 +6,7 @@ def yolo_detection(image, confiance):
 
     model = YOLO(os.path.dirname(os.path.abspath(__file__)) + '/Assets/model.pt')
 
-    pred = model(image, conf = confiance)
+    pred = model.predict(image, conf = confiance, max_det = 2000, iou = 0.3)
 
     return pred[0]
 
@@ -14,9 +14,9 @@ def yolo_detection(image, confiance):
 def plot_bboxes(img, boxes, thickness, score=True, name=True):
   
     image = img.copy()
-    labels = {0: "clean", 1: "marked"}
+    labels = {0: "cell"}
 
-    colors = [(0, 255, 0),(255, 0, 0)]
+    colors = [(255, 0, 0)]
   
 
     for box in boxes:
@@ -104,21 +104,22 @@ def show_all_detections(image):
 
     return image_combin
 
-HEIGHT_SQUARE = 462
-WIDTH_SQUARE = 580
+def calcul_malassez(images, img_40):
 
-def calcul_malassez(images):
-
+    if img_40:
+        w, h = 230, 185
+    else:
+        w, h = 580, 462
     for key in images:
         liste_nb_cells = []
         liste_detection = [box.tolist() for box in images[key]['pred'].boxes.boxes]
 
-        for y in range(images[key]['image'].shape[0]//HEIGHT_SQUARE):
-            for x in range(images[key]['image'].shape[1]//WIDTH_SQUARE):
-                x_min = x * WIDTH_SQUARE
-                x_max = x * WIDTH_SQUARE + WIDTH_SQUARE
-                y_min = y * HEIGHT_SQUARE
-                y_max = y * HEIGHT_SQUARE + HEIGHT_SQUARE
+        for y in range(images[key]['image'].shape[0]//h):
+            for x in range(images[key]['image'].shape[1]//w):
+                x_min = x * w
+                x_max = x * w + w
+                y_min = y * h
+                y_max = y * h + h
                 nb_cells = 0
 
 
@@ -130,7 +131,7 @@ def calcul_malassez(images):
 
                 liste_nb_cells.append(nb_cells)
 
-        images[key]['concentration'] = (sum(liste_nb_cells) / (len(liste_nb_cells)))
+        images[key]['concentration'] = round(sum(liste_nb_cells) / (len(liste_nb_cells)), 3)
 
     return (images)
 
@@ -142,19 +143,3 @@ def get_std(liste):
     mean_squared_differences = sum(squared_differences) / len(squared_differences)
     std = mean_squared_differences ** 0.5
     return(round(std, 2))
-
-# def calcul_recouvrement(image):
-#     liste_dirty_cell_avg_black = []
-#     liste_detection = pred.boxes.boxes
-#     image_bw = image
-
-#     for box in liste_detection[:]:
-#         if box[-1] == 1:
-#             select = image_bw[box[1]:box[3], box[0]:box[2]].copy()
-#             row_avg = []
-#             for row in select :
-#                 row_avg.append(sum(row) / len(row))
-
-#             liste_dirty_cell_avg_black.append(sum(row_avg) / len(row_avg))
-
-#     return(sum(liste_dirty_cell_avg_black) / len(liste_dirty_cell_avg_black))

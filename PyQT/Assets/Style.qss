@@ -3,6 +3,7 @@
 /*-----QMainWindow-----*/
 QMainWindow {
 	background-image: url(Assets:Fond.jpg);
+	background-attachment: fixed;
 }
 
 /*-----QProgressDialog-----*/
@@ -530,11 +531,21 @@ QCheckBox::indicator:disabled
 
 
 /*-----QRadioButton-----*/
+QRadioButton
+{
+	background-color: transparent;
+	color: #242F62;
+	font-weight: bold;
+	font-family : Trebuchet MS;
+	font-size : 20px;
+	
+}
+
 QRadioButton::indicator::unchecked
 { 
-	border: 2px inset gray; 
+	border: 2px solid #000000; 
 	border-radius: 5px; 
-	background-color:  #fff;
+	background-color:  transparent;
 	width: 9px; 
 	height: 9px; 
 
@@ -545,7 +556,6 @@ QRadioButton::indicator::unchecked:hover
 { 
 	border: 2px solid #607cff; 
 	border-radius: 5px; 
-	background-color:  #fff;
 	width: 9px; 
 	height: 9px; 
 
@@ -554,9 +564,18 @@ QRadioButton::indicator::unchecked:hover
 
 QRadioButton::indicator::checked
 { 
-	border: 2px inset darkgray; 
+	border: 2px solid #000000; 
 	border-radius: 5px; 
-	background-color: #4969ff; 
+	background-color: #242F62; 
+	width: 9px; 
+	height: 9px; 
+
+}
+
+QRadioButton::indicator::checked:hover
+{ 
+	border: 2px solid #607cff; 
+	border-radius: 5px; 
 	width: 9px; 
 	height: 9px; 
 

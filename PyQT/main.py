@@ -168,8 +168,8 @@ class Ui_MainWindow(object):
         self.type_2c_label = QtWidgets.QLabel(self.select)
         self.type_2c_label.setObjectName("type_2c_label")
         self.image_type_layout.addWidget(self.type_2c_label, 5, 1, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.image_type_layout.addItem(spacerItem1, 4, 1, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem, 4, 1, 1, 1)
         self.type_2s_label = QtWidgets.QLabel(self.select)
         self.type_2s_label.setObjectName("type_2s_label")
         self.image_type_layout.addWidget(self.type_2s_label, 2, 1, 1, 1)
@@ -195,10 +195,10 @@ class Ui_MainWindow(object):
         self.image_select_label.setAlignment(QtCore.Qt.AlignCenter)
         self.image_select_label.setObjectName("image_select_label")
         self.image_type_layout.addWidget(self.image_select_label, 0, 1, 1, 1)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.image_type_layout.addItem(spacerItem2, 4, 2, 1, 1)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.image_type_layout.addItem(spacerItem3, 1, 1, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem, 4, 2, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_type_layout.addItem(spacerItem, 1, 1, 1, 1)
         self.image_type_layout.setRowMinimumHeight(0, 60)
         self.image_type_layout.setRowMinimumHeight(1, 60)
         self.image_type_layout.setRowMinimumHeight(2, 60)
@@ -206,8 +206,8 @@ class Ui_MainWindow(object):
         self.image_type_layout.setRowMinimumHeight(4, 60)
         self.image_select_layout.addLayout(self.image_type_layout)
 
-        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.image_select_layout.addItem(spacerItem5)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.image_select_layout.addItem(spacerItem)
 
         self.cycle_layout = QtWidgets.QHBoxLayout()
         self.cycle_layout.setObjectName("cycle_layout")
@@ -224,21 +224,17 @@ class Ui_MainWindow(object):
         self.cycle_next_button.setEnabled(False)
         self.cycle_layout.addWidget(self.cycle_next_button)
 
-        self.image_select_layout.addLayout(self.cycle_layout)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.cycle_layout.addItem(spacerItem)
 
-        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.image_select_layout.addItem(spacerItem4)
-        self.image_select_confirm_layout = QtWidgets.QHBoxLayout()
-        self.image_select_confirm_layout.setObjectName("image_select_confirm_layout")
         self.image_select_confirm = QtWidgets.QPushButton(self.select)
         self.image_select_confirm.setObjectName("image_select_confirm")
+        self.image_select_confirm.setEnabled(False)
         self.image_select_confirm.clicked.connect(self.set_file_list)
-        self.image_select_confirm_layout.addWidget(self.image_select_confirm)
-        self.image_select_deny = QtWidgets.QPushButton(self.select)
-        self.image_select_deny.setObjectName("image_select_deny")
-        self.image_select_deny.clicked.connect(self.reset_file)
-        self.image_select_confirm_layout.addWidget(self.image_select_deny)
-        self.image_select_layout.addLayout(self.image_select_confirm_layout)
+        self.cycle_layout.addWidget(self.image_select_confirm)
+
+        self.image_select_layout.addLayout(self.cycle_layout)
+
         self.browser.addWidget(self.select)
 
 #####################################  Yolo detection  ########################################################
@@ -361,12 +357,37 @@ class Ui_MainWindow(object):
 
         self.calc_buttons_layout = QtWidgets.QHBoxLayout()
         self.calc_buttons_layout.setObjectName("Calc_buttons_layout")
+
+
         self.start_calc_button = QtWidgets.QPushButton(self.calculs)
         self.start_calc_button.setObjectName("start_calc_button")
         self.start_calc_button.clicked.connect(self.start_calc)
         self.calc_buttons_layout.addWidget(self.start_calc_button)
+
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.calc_buttons_layout.addItem(spacerItem)
+
+        self.img_size_layout = QtWidgets.QHBoxLayout()
+        self.img_size_layout.setObjectName("img_size_layout")
+        self.img_size_layout.setSpacing(15)
+
+        self.img_size_label = QtWidgets.QLabel(self.calculs)
+        self.img_size_label.setObjectName("img_size_label")
+        self.calc_buttons_layout.addWidget(self.img_size_label)
+
+        self.img_size_40 = QtWidgets.QRadioButton(self.calculs)
+        self.img_size_40.setObjectName("img_size_40")
+        self.img_size_layout.addWidget(self.img_size_40)
+
+        self.img_size_100 = QtWidgets.QRadioButton(self.calculs)
+        self.img_size_100.setObjectName("img_size_100")
+        self.img_size_layout.addWidget(self.img_size_100)
+
+        self.calc_buttons_layout.addLayout(self.img_size_layout)
+
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.calc_buttons_layout.addItem(spacerItem)
+
         self.calc_button_save_xlsx = QtWidgets.QPushButton(self.calculs)
         self.calc_button_save_xlsx.setObjectName("calc_button_save_xlsx")
         self.calc_button_save_xlsx.setEnabled(False)
@@ -451,8 +472,7 @@ class Ui_MainWindow(object):
         self.type_3c_label.setText(_translate("MainWindow", "Echantillon 3 : Culot"))
         self.cycle_next_button.setText(_translate("MainWindow", "Echantillon suivant"))
         self.cycle_prev_button.setText(_translate("MainWindow", "Echantillon précédent"))
-        self.image_select_confirm.setText(_translate("MainWindow", "Valider"))
-        self.image_select_deny.setText(_translate("MainWindow", "Annuler"))
+        self.image_select_confirm.setText(_translate("MainWindow", "Confirmer"))
         self.show_conf_label.setText(_translate("MainWindow", "Montrer la confiance"))
         self.show_name_label.setText(_translate("MainWindow", "Montrer le nom du label"))
         self.taux_conf_label.setText(_translate("MainWindow", "Intervalle de confiance"))
@@ -463,14 +483,17 @@ class Ui_MainWindow(object):
         self.show_detection_button.setText(_translate("MainWindow", "Voir uniquement les cellules détectées"))
         self.show_pred_button.setText(_translate("MainWindow", "Voir l'image"))
         self.start_calc_button.setText(_translate("MainWindow", "Lancer les calculs"))
+        self.img_size_label.setText(_translate("MainWindow", "Grossissement des images :"))
+        self.img_size_40.setText(_translate("MainWindow", "x40"))
+        self.img_size_100.setText(_translate("MainWindow", "x100"))
         self.calc_button_save_xlsx.setText(_translate("MainWindow", "Sauvegarder au format .xlsx"))
         self.calc_button_save_csv.setText(_translate("MainWindow", "Sauvegarder au format .csv"))
         self.calculs_table.verticalHeaderItem(0).setText(_translate("MainWindow", "Nombre de cellules total"))
         self.calculs_table.verticalHeaderItem(1).setText(_translate("MainWindow", "Nombre capturées"))
         self.calculs_table.verticalHeaderItem(2).setText(_translate("MainWindow", "Nombre non-capturées"))
-        self.calculs_table.verticalHeaderItem(3).setText(_translate("MainWindow", "Ratio de capture"))
-        self.calculs_table.verticalHeaderItem(4).setText(_translate("MainWindow", "Concentration culot"))
-        self.calculs_table.verticalHeaderItem(5).setText(_translate("MainWindow", "Concentration surnageant"))
+        self.calculs_table.verticalHeaderItem(3).setText(_translate("MainWindow", "Ratio de capture (%)"))
+        self.calculs_table.verticalHeaderItem(4).setText(_translate("MainWindow", "Concentration culot (x10\u2075)"))
+        self.calculs_table.verticalHeaderItem(5).setText(_translate("MainWindow", "Concentration surnageant (x10\u2075)"))
         self.calculs_table.horizontalHeaderItem(0).setText(_translate("MainWindow", "Echantillon 1"))
         self.calculs_table.horizontalHeaderItem(1).setText(_translate("MainWindow", "Echantillon 2"))
         self.calculs_table.horizontalHeaderItem(2).setText(_translate("MainWindow", "Echantillon 3"))
@@ -507,6 +530,7 @@ class Ui_MainWindow(object):
         self.calculs_button.setEnabled(False)
         self.cycle_next_button.setEnabled(False)
         self.cycle_prev_button.setEnabled(False)
+        self.image_select_confirm.setEnabled(False)
         self.calc_button_save_csv.setEnabled(False)
         self.calc_button_save_xlsx.setEnabled(False)
 
@@ -529,9 +553,17 @@ class Ui_MainWindow(object):
                         self.type_3s.addItem(file)
                     elif name[-2:] == '3c':
                         self.type_3c.addItem(file)
+
+                    if name.find('100') != -1:
+                        self.img_size_100.setChecked(True)
+                    else:
+                        self.img_size_40.setChecked(True)
         
         if self.type_1s.count() > 1:
             self.cycle_next_button.setEnabled(True)
+
+        if self.type_1s.count() >= 1 and self.type_1c.count() >= 1 and self.type_2s.count() >= 1 and self.type_2c.count() >= 1 and self.type_3s.count() >= 1 and self.type_3c.count() >= 1:
+            self.image_select_confirm.setEnabled(True)
 
         self.select_button.setEnabled(True)            
         self.change_page_1()
@@ -548,16 +580,6 @@ class Ui_MainWindow(object):
         self.loadimages()
         self.browser.setCurrentIndex(2)
         self.files.setCurrentRow(0)
-        
-
-    def reset_file(self):
-        self.files.clear()
-        self.type_1s.clear()
-        self.type_2s.clear()
-        self.type_3s.clear()
-        self.type_1c.clear()
-        self.type_2c.clear()
-        self.type_3c.clear()
 
     def cycle_next(self):
         if self.type_1s.count() > self.type_1s.currentIndex()+1 and self.type_1c.count() > self.type_1c.currentIndex()+1 and self.type_2s.count() > self.type_2s.currentIndex()+1 and self.type_2c.count() > self.type_2c.currentIndex()+1 and self.type_3s.count() > self.type_3s.currentIndex()+1 and self.type_3c.count() > self.type_3c.currentIndex()+1:
@@ -568,8 +590,7 @@ class Ui_MainWindow(object):
             self.type_3s.setCurrentIndex(self.type_3s.currentIndex() + 1)
             self.type_3c.setCurrentIndex(self.type_3c.currentIndex() + 1)
             self.cycle_prev_button.setEnabled(True)
-            print(self.type_2c.count())
-            print(self.type_2c.currentIndex())
+
         else:
             self.cycle_next_button.setEnabled(False)
 
@@ -676,7 +697,7 @@ class Ui_MainWindow(object):
         self.show_detection_button.setEnabled(True)
 
     def start_calc(self):
-        self.images = utils.calcul_malassez(self.images)
+        self.images = utils.calcul_malassez(self.images, self.img_size_40.isChecked())
         self.set_calculs()
 
     def set_calculs(self):
@@ -684,11 +705,11 @@ class Ui_MainWindow(object):
 
             if self.images[key]['type'] == 'c':
                 self.calculs_table.setItem(1, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
-                self.calculs_table.setItem(4, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + ""))
+                self.calculs_table.setItem(4, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration'])))
 
             elif self.images[key]['type'] == 's':
                 self.calculs_table.setItem(2, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(len(self.images[key]['pred'].boxes.boxes))))
-                self.calculs_table.setItem(5, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration']) + "x10\u2075"))
+                self.calculs_table.setItem(5, int(self.images[key]['echantillon']) - 1, QtWidgets.QTableWidgetItem(str(self.images[key]['concentration'])))
 
         e1_c_nb = int(self.calculs_table.item(1, 0).text())
         e2_c_nb = int(self.calculs_table.item(1, 1).text())
@@ -697,12 +718,12 @@ class Ui_MainWindow(object):
         e2_s_nb = int(self.calculs_table.item(2, 1).text())
         e3_s_nb = int(self.calculs_table.item(2, 2).text())
 
-        e1_c_con = float(self.calculs_table.item(4, 0).text()[:-4])
-        e2_c_con = float(self.calculs_table.item(4, 1).text()[:-4])
-        e3_c_con = float(self.calculs_table.item(4, 2).text()[:-4])
-        e1_s_con = float(self.calculs_table.item(5, 0).text()[:-4])
-        e2_s_con = float(self.calculs_table.item(5, 1).text()[:-4])
-        e3_s_con = float(self.calculs_table.item(5, 2).text()[:-4])
+        e1_c_con = float(self.calculs_table.item(4, 0).text())
+        e2_c_con = float(self.calculs_table.item(4, 1).text())
+        e3_c_con = float(self.calculs_table.item(4, 2).text())
+        e1_s_con = float(self.calculs_table.item(5, 0).text())
+        e2_s_con = float(self.calculs_table.item(5, 1).text())
+        e3_s_con = float(self.calculs_table.item(5, 2).text())
 
         e1_nb = e1_c_nb + e1_s_nb
         e2_nb = e2_c_nb + e2_s_nb
@@ -716,9 +737,9 @@ class Ui_MainWindow(object):
         e2_ratio = round(e2_c_nb / e2_nb * 100, 1)
         e3_ratio = round(e3_c_nb / e3_nb * 100, 1)
 
-        self.calculs_table.setItem(3, 0, QtWidgets.QTableWidgetItem(str(e1_ratio) + "%"))
-        self.calculs_table.setItem(3, 1, QtWidgets.QTableWidgetItem(str(e2_ratio) + "%"))
-        self.calculs_table.setItem(3, 2, QtWidgets.QTableWidgetItem(str(e3_ratio) + "%"))
+        self.calculs_table.setItem(3, 0, QtWidgets.QTableWidgetItem(str(e1_ratio)))
+        self.calculs_table.setItem(3, 1, QtWidgets.QTableWidgetItem(str(e2_ratio)))
+        self.calculs_table.setItem(3, 2, QtWidgets.QTableWidgetItem(str(e3_ratio)))
 
         self.calculs_table.setItem(0, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_nb, e2_nb, e3_nb]))))
         self.calculs_table.setItem(1, 3, QtWidgets.QTableWidgetItem(str(utils.get_std([e1_c_nb, e2_c_nb, e3_c_nb]))))
