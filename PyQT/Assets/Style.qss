@@ -132,8 +132,8 @@ QToolTip
 /*-----QPushButton-----*/
 QPushButton
 {
-	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0.2 rgba(16, 165, 107, 255),stop:1 rgba(238, 246, 240, 255));
-	color: #ffffff;
+	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0.2 rgba(16, 165, 107, 255),stop:1 rgba(238, 246, 240, 220));
+	color: #242F62;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 3px;
@@ -141,7 +141,7 @@ QPushButton
 	padding: 5px;
 	font-weight: bold;
 	font-family : Trebuchet MS;
-	font-size : 14px;
+	font-size : 18px;
 
 }
 
@@ -1094,8 +1094,8 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 /*-----QProgressBar-----*/
 QProgressBar
 {
-	background-color: #242F62;
-	color: #ffffff;
+	background-color: transparent;
+	color: #242F62;
 	border: 1px solid #607cff;
 	border-radius: 4px;
 	text-align: center;
@@ -1106,7 +1106,7 @@ QProgressBar
 
 
 QProgressBar::chunk {
-	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(16, 165, 107, 255),stop:1 rgba(238, 246, 240, 255));
+	background-color: qlineargradient(spread:repeat, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(16, 165, 107, 255),stop:1 rgba(238, 246, 240, 200));
 	color: #fff;
 
 }
