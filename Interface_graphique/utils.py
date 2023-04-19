@@ -22,6 +22,8 @@ def plot_bboxes(img, boxes, thickness, score=True):
         
         if score :
             label = str(round(100 * float(box[-2]), 1)) + "%"
+        else :
+            label = ''
 
         color = colors[int(box[-1])]
 

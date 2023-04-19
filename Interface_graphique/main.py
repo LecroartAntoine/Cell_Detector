@@ -590,6 +590,11 @@ class Ui_MainWindow(object):
         self.type_2c.clear()
         self.type_3c.clear()
 
+        for row in range(self.calculs_table.rowCount()):
+            for column in range(self.calculs_columnCount()):
+                item = QtWidgets.QTableWidgetItem("")
+                self.calculs_table.setItem(row, column, item)
+
         self.detection_button.setEnabled(False)
         self.analyse_button.setEnabled(False)
         self.calculs_button.setEnabled(False)
