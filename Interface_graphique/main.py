@@ -591,7 +591,7 @@ class Ui_MainWindow(object):
         self.type_3c.clear()
 
         for row in range(self.calculs_table.rowCount()):
-            for column in range(self.calculs_columnCount()):
+            for column in range(self.calculs_table.columnCount()):
                 item = QtWidgets.QTableWidgetItem("")
                 self.calculs_table.setItem(row, column, item)
 
